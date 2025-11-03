@@ -1,0 +1,8 @@
+{
+  "routes": [
+    {
+      "route": "/api/*",
+      "rewrite": "BACKEND_URL_PLACEHOLDER/api/*"
+    }
+  ]
+}
