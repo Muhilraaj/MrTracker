@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/event")
+@RequestMapping("/api/events")
 public class EventController {
 
     private final EventService eventService;
@@ -28,8 +28,8 @@ public class EventController {
     }
 
     @GetMapping("/range")
-    public Map<String,List<Event>> getEventsByDate(@RequestParam Instant start,@RequestParam Instant end) {
-        return eventService.getEventsByDate(start,end);
+    public Map<String,List<Event>> getEventsByDate(@RequestParam Instant startDate,@RequestParam Instant endDate) {
+        return eventService.getEventsByDate(startDate,endDate);
     }
 
     @PostMapping

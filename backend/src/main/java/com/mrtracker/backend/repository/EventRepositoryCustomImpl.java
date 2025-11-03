@@ -25,7 +25,7 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
     @Override
     public Map<String, List<Event>> getEvents(Instant startDate, Instant endDate) {
         MatchOperation match = Aggregation.match(
-                Criteria.where("eventDate").gte(startDate).lt(endDate)
+                Criteria.where("eventDate").gte(startDate).lte(endDate)
         );
         ProjectionOperation project = Aggregation.project()
                 .andExpression("{ $dateToString: { format: '%Y-%m-%d', date: '$eventDate', timezone: 'UTC' } }")
