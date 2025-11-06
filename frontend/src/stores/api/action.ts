@@ -3,7 +3,7 @@ import type { Action, ActionParameters } from '../../types/types';
 
 export const actionApi = createApi({
   reducerPath: 'actionApi',
-  baseQuery: fetchBaseQuery({ baseUrl: `${import.meta.env.VITE_API_URL}/api/actions` }),
+  baseQuery: fetchBaseQuery({ baseUrl: `/api/actions`, credentials: 'include' }),
   endpoints: (builder) => ({
     getActions: builder.query<Action[], ActionParameters | void>({
       query: (params) => ({ url: '', params: { ...params } }),

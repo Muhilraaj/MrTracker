@@ -51,5 +51,15 @@ export interface EventActionDTO{
     prompt: string;
 }
 
+export type AuthBody = {
+    username: string;
+    password: string;
+};
+
+export type AuthResponse = {
+    message: string;
+    expiryMinutes: number;
+};
+
 type DialogActionType = 'complete' | 'cancel' | 'revert';
 export type { Action, Event, ActionParameters, EventParameters, ToDoProps, DialogActionType, TaskStyle, DialogWrapperProps };

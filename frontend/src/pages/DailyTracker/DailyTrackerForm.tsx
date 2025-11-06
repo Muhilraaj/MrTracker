@@ -17,6 +17,8 @@ import { useGetEventsQuery, usePostEventMutation } from "../../stores/api/event"
 import moment from "moment";
 import type { EventActionDTO } from "../../types/types";
 import { Grid } from "@mui/material";
+import { showSnackbar } from "../../stores/slices/snackbarSlice";
+import { useDispatch } from "react-redux";
 
 export const DailyTrackerForm = () => {
     const dateUTC = moment.utc();
@@ -27,6 +29,7 @@ export const DailyTrackerForm = () => {
     const [currentEventActions, setCurrentEventActions] = useState<EventActionDTO[]>([]);
     const [selectedEventAction, setSelectedEventAction] = useState<EventActionDTO | null>(null);
     const [postEvent] = usePostEventMutation();
+    const dispatch = useDispatch();
 
     const isLoading = isLoadingActiveAction || isLoadingTodayEvents;
 
@@ -48,12 +51,16 @@ export const DailyTrackerForm = () => {
 
     const onSubmitDialog = () => {
         // Handle dialog submission logic here
-        console.log(selectedEventAction);
-        postEvent({
-            actionId: selectedEventAction?.actionId || '',
-            status: selectedEventAction?.status || 10
-        });
-        setOpenDialog(false);
+        try {
+            postEvent({
+                actionId: selectedEventAction?.actionId || '',
+                status: selectedEventAction?.status || 10
+            }).unwrap();
+            setOpenDialog(false);
+            dispatch(showSnackbar({ message: 'Event updated successfully', type: 'success' }));
+        } catch (error) {
+            dispatch(showSnackbar({ message: 'Failed to update event', type: 'error' }));
+        }
     }
     return (
         <ThemeProvider theme={theme}>
