@@ -12,8 +12,10 @@ on:
   pull_request:
     types: [closed]
     branches:
-      - dev
-      
+      [ dev ]
+    paths:
+      [ 'backend/**', '.github/workflow/backend-dev.yml' ]
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
