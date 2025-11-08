@@ -8,6 +8,7 @@ on:
     paths:
     - 'backend/**'
     - '.github/workflows/backend-dev.yml'
+  # Or when a PR is merged to dev branch
   pull_request:
     types: [closed]
     branches:
