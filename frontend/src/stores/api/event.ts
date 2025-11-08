@@ -5,7 +5,7 @@ import moment from 'moment';
 
 export const eventApi = createApi({
   reducerPath: 'eventApi',
-  baseQuery: fetchBaseQuery({ baseUrl: `${import.meta.env.VITE_API_URL}/api/events` }),
+  baseQuery: fetchBaseQuery({ baseUrl: `/api/events`, credentials: 'include' }),
   tagTypes: ['Events'],
   endpoints: (builder) => ({
     getEvents: builder.query<Record<string, Event[]>, EventParameters | null>({

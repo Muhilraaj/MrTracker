@@ -1,0 +1,53 @@
+name: Deploy Container - Backend - Mr Tracker Dev
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ dev ]
+    paths:
+    - 'backend/**'
+    - '.github/workflows/backend-dev.yml'
+  pull_request:
+    types: [closed]
+    branches:
+      - dev
+      
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v5
+      
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build Spring Boot JAR
+        run: mvn clean package -DskipTests
+        working-directory: ./backend
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }}/backend
+          environmentVariables: spring.data.mongodb.uri = ${{secrets.AZURE_MONGO_URI}} spring.data.mongodb.database = ${{secrets.MONGO_DB_NAME_DEV}} jwt.secret = ${{secrets.JWT_SECRET}} jwt.expiration = ${{secrets.JWT_EXPIRATION}}
+          registryUrl: docker.io
+          registryUsername: ${{ secrets.DOCKER_USERNAME }}
+          registryPassword: ${{ secrets.DOCKER_PASSWORD }}
+          containerAppName:  ${{secrets.BACKEND_CONTAINER_NAME_DEV}}
+          resourceGroup: ${{secrets.BACKEND_RESOURCE_GROUP_NAME_DEV}}
+          imageToBuild: ${{secrets.BACKEND_IMAGE_NAME_DEV}}:latest
+          
+
+     
+
