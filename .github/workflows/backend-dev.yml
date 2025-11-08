@@ -6,13 +6,8 @@ on:
     branches: 
       [ dev ]
     paths:
-      [ 'backend/**', '.github/workflow/backend-dev.yml' ]
-  pull_request:
-    types: [closed]
-    branches:
-      [ dev ]
-    paths:
-      [ 'backend/**', '.github/workflow/backend-dev.yml' ]
+      [ 'backend/**', '.github/workflows/backend-dev.yml' ]
+
 
 jobs:
   build-and-deploy:
