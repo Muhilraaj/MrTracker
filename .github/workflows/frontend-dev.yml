@@ -22,16 +22,15 @@ jobs:
         run: |
           # 1. Export the variable so envsubst can find it.
           #    (Using 'export' is cleaner in a script block).
-          export BACKEND_URL=MUHIL
+          export BACKEND_URL=s
 
           # 2. Run envsubst, writing to a new temporary file.
           #    The '$BACKEND_URL' tells envsubst to ONLY replace this one variable.
-          envsubst '$BACKEND_URL' < ./frontend/staticwebapp.config.json > ./frontend/staticwebapptemp.config.json
+          envsubst '$BACKEND_URL' < ./frontend/staticwebapp.config.json > ./frontend/staticwebapp.config.json
 
           # 3. Overwrite the original file with the new one.
-          mv ./frontend/staticwebapptemp.config.json ./frontend/staticwebapp.config.json
-          cat ./frontend/staticwebapp.config.json
-      
+          mv ./frontend/staticwebapp.config.json ./frontend/dist/staticwebapp.config.json
+
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
