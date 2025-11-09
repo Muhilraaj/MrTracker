@@ -5,8 +5,8 @@
       "rewrite": "https://mr-tracker-dev.greenplant-2cf22a25.australiaeast.azurecontainerapps.io/api/*"
     },
     {
-      "route": "/auth/*",
-      "rewrite": "https://mr-tracker-dev.greenplant-2cf22a25.australiaeast.azurecontainerapps.io/auth/*"
+      "route": "/auth/login",
+      "rewrite": "https://mr-tracker-dev.greenplant-2cf22a25.australiaeast.azurecontainerapps.io/auth/login"
     }
   ],
    "navigationFallback": {
