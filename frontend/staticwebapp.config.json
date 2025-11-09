@@ -1,10 +1,6 @@
 {
   "routes": [
     {
-      "route": "",
-      "rewrite": ""
-    },
-    {
       "route": "/api/*",
       "rewrite": "$BACKEND_URL/api/*"
     },
