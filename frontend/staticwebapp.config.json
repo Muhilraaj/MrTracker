@@ -2,11 +2,11 @@
   "routes": [
     {
       "route": "/api/*",
-      "rewrite": "BACKEND_URL_PLACEHOLDER/api/*"
+      "rewrite": "$BACKEND_URL/api/*"
     },
      {
       "route": "/auth/*",
-      "rewrite": "BACKEND_URL_PLACEHOLDER/auth/*"
+      "rewrite": "$BACKEND_URL/auth/*"
     }
   ]
 }
