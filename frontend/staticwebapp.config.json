@@ -6,7 +6,8 @@
     },
     {
       "route": "/auth/login",
-      "rewrite": "https://mr-tracker-dev.greenplant-2cf22a25.australiaeast.azurecontainerapps.io/auth/login"
+      "rewrite": "https://mr-tracker-dev.greenplant-2cf22a25.australiaeast.azurecontainerapps.io/auth/login",
+      "redirect": "https://mr-tracker-dev.greenplant-2cf22a25.australiaeast.azurecontainerapps.io/auth/login"
     },
     {
       "route": "/auth/*",
