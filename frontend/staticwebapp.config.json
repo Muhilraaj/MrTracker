@@ -5,11 +5,6 @@
       "rewrite": "https://mr-tracker-dev.greenplant-2cf22a25.australiaeast.azurecontainerapps.io"
     },
     {
-      "route": "/auth/login",
-      "redirect": "https://mr-tracker-dev.greenplant-2cf22a25.australiaeast.azurecontainerapps.io/auth/login",
-      "statusCode": 200
-    },
-    {
       "route": "/auth/*",
       "redirect": "https://mr-tracker-dev.greenplant-2cf22a25.australiaeast.azurecontainerapps.io/auth/*"
     }
