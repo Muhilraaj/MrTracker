@@ -6,7 +6,7 @@ on:
     branches: 
       [ dev ]
     paths:
-      [ 'front-end/**', '.github/workflows/frontend-dev.yml' ]
+      [ 'frontend/**', '.github/workflows/frontend-dev.yml' ]
 
 
 jobs:
@@ -35,6 +35,6 @@ jobs:
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
           app_location: "frontend" # App source code path
           api_location: "" # Api source code path - optional
-          output_location: "build" # Built app content directory - optional
+          output_location: "dist" # Built app content directory - optional
           ###### End of Repository/Build Configurations ######
  
