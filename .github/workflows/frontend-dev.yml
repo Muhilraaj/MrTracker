@@ -43,7 +43,9 @@ jobs:
       # 3) Copy the updated config into the built dist folder (THIS IS THE FIX)
       - name: Copy config into dist
         working-directory: ./frontend
-        run: cp staticwebapp.config.json dist/staticwebapp.config.json
+        run: | 
+          cp staticwebapp.config.json dist/staticwebapp.config.json
+          cat dist/staticwebapp.config.json
 
       - name: Build And Deploy
         id: builddeploy
