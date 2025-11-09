@@ -20,7 +20,7 @@ jobs:
           submodules: true  # Fetches submodules
 
       - name: Replace backend URL placeholder in staticwebapp config
-        run: BACKEND_URL=${{ secrets.BACKEND_API_URL_DEV }} envsubst < ./frontend/staticwebapp.config.template.json > ./frontend/staticwebapp.config.json
+        run: BACKEND_URL=${{ secrets.BACKEND_API_URL_DEV }} envsubst < ./frontend/staticwebapp.config.json > ./frontend/staticwebapp.config.json
       
       - name: Build And Deploy
         id: builddeploy
