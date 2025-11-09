@@ -21,8 +21,16 @@ jobs:
 
       - name: Replace backend URL placeholder in staticwebapp config
         run: |
-          BACKEND_URL=${{ secrets.BACKEND_API_URL_DEV }} envsubst < ./frontend/staticwebapp.config.json > ./frontend/staticwebapp.config.json
-          vi ./frontend/staticwebapp.config.json
+          # 1. Export the variable so envsubst can find it.
+          #    (Using 'export' is cleaner in a script block).
+          export BACKEND_URL=${{ secrets.BACKEND_API_URL_DEV }}
+
+          # 2. Run envsubst, writing to a new temporary file.
+          #    The '$BACKEND_URL' tells envsubst to ONLY replace this one variable.
+          envsubst '$BACKEND_URL' < ./frontend/staticwebapp.config.json > ./frontend/staticwebapp.config.json.tmp
+
+          # 3. Overwrite the original file with the new one.
+          mv ./frontend/staticwebapp.config.json.tmp ./frontend/staticwebapp.config.json
       
       - name: Build And Deploy
         id: builddeploy
