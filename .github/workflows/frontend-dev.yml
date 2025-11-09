@@ -18,15 +18,6 @@ jobs:
         with:
           submodules: true
 
-      # 1. Install & build Vite app (creates ./frontend/dist)
-      - name: Install dependencies
-        working-directory: ./frontend
-        run: npm install
-
-      - name: Build Vite app
-        working-directory: ./frontend
-        run: npm run build
-        
       # 4. Deploy the dist folder
       - name: Build And Deploy
         id: builddeploy
@@ -37,8 +28,6 @@ jobs:
           action: "upload"
           
           # This points to the final folder to be deployed
-          app_location: "frontend/dist" 
+          app_location: "frontend" 
           api_location: "" 
-          
-          # We built it, so skip the action's build
-          skip_app_build: true
+          output_location: "dist"
