@@ -8,5 +8,9 @@
       "route": "/auth/*",
       "rewrite": "$BACKEND_URL/auth/*"
     }
-  ]
+  ],
+   "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/api/*", "/auth/*"]
+  }
 }

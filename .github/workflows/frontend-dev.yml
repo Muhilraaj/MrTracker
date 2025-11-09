@@ -1,4 +1,4 @@
-name: Deploy Static Web App - Frontend - My Fin App Dev
+name: Deploy Static Web App - Frontend - Mr Tracker Dev
 # When this action will be executed
 on:
   # Automatically trigger it when detected changes in repo
