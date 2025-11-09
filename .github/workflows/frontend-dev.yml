@@ -31,6 +31,7 @@ jobs:
 
           # 3. Overwrite the original file with the new one.
           mv ./frontend/staticwebapp.config.json.tmp ./frontend/staticwebapp.config.json
+          cat ./frontend/staticwebapp.config.json
       
       - name: Build And Deploy
         id: builddeploy
