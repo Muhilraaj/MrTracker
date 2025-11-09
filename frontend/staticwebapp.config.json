@@ -5,6 +5,10 @@
       "rewrite": "$BACKEND_URL/api/*"
     },
     {
+      "route": "/apt/*",
+      "rewrite": "$BACKEND_URL/apt/*"
+    },
+    {
       "route": "/auth/*",
       "rewrite": "$BACKEND_URL/auth/*"
     }
