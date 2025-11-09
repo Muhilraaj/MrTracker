@@ -21,7 +21,7 @@ jobs:
 
       - name: Replace backend URL placeholder in staticwebapp config
         run: |
-          BACKEND_URL=${{ secrets.BACKEND_API_URL_DEV }} envsubst < ./frontend/staticwebapp.configs.json > ./frontend/staticwebapp.config.json
+          BACKEND_URL=${{ secrets.BACKEND_API_URL_DEV }} envsubst < ./frontend/staticwebapp.config.json > ./frontend/staticwebapp.config.json
           cat ./frontend/staticwebapp.config.json
       
       - name: Build And Deploy
