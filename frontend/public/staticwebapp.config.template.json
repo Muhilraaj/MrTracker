@@ -3,6 +3,10 @@
     {
       "route": "/api/*",
       "rewrite": "BACKEND_URL_PLACEHOLDER/api/*"
+    },
+     {
+      "route": "/auth/*",
+      "rewrite": "BACKEND_URL_PLACEHOLDER/auth/*"
     }
   ]
 }
