@@ -8,7 +8,6 @@ on:
     paths:
       [ 'frontend/**', '.github/workflows/frontend-dev.yml' ]
 
-
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
@@ -17,33 +16,51 @@ jobs:
       - name: Checkout to the branch
         uses: actions/checkout@v5
         with:
-          submodules: true  # Fetches submodules
+          submodules: true
 
-      - name: Replace backend URL placeholder in staticwebapp config
+      # 1. Add a step to set up Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24' # Or your project's version
+
+      # 2. Add a step to build your app manually
+      - name: Install and Build
         run: |
-          # 1. Export the variable so envsubst can find it.
-          #    (Using 'export' is cleaner in a script block).
+          cd frontend
+          npm install
+          tsc -b && vite build
+        # This step creates the 'frontend/dist' folder
+
+      # 3. Copy the config file into the 'dist' folder AFTER building
+      - name: Copy config file to output directory
+        run: cp ./frontend/staticwebapp.config.json ./frontend/dist/staticwebapp.config.json
+
+      # 4. Run substitution on the file INSIDE 'dist'
+      - name: Replace backend URL placeholder
+        run: |
           export BACKEND_URL=${{ secrets.BACKEND_API_URL_DEV }}
+          
+          # Notice the path points to the 'dist' folder
+          envsubst '$BACKEND_URL' < ./frontend/dist/staticwebapp.config.json > ./frontend/dist/staticwebapp.config.json.tmp
+          mv ./frontend/dist/staticwebapp.config.json.tmp ./frontend/dist/staticwebapp.config.json
+          
+          echo "--- Verifying final config file ---"
+          cat ./frontend/dist/staticwebapp.config.json
 
-          # 2. Run envsubst, writing to a new temporary file.
-          #    The '$BACKEND_URL' tells envsubst to ONLY replace this one variable.
-          envsubst '$BACKEND_URL' < ./frontend/staticwebapp.config.json > ./frontend/staticwebapp.config.json.tmp
-
-          # 3. Overwrite the original file with the new one.
-          mv ./frontend/staticwebapp.config.json.tmp ./frontend/staticwebapp.config.json
-          cat ./frontend/staticwebapp.config.json
-      
+      # 5. Deploy, but tell the action to SKIP its own build
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.FRONTEND_WEB_APP_TOKEN_DEV }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "frontend" # App source code path
-          api_location: "" # Api source code path - optional
-          output_location: "dist" # Built app content directory - optional
-          ###### End of Repository/Build Configurations ######
- 
+          
+          app_location: "frontend" 
+          api_location: "" 
+          output_location: "dist" 
+
+          # --- THIS IS THE FINAL FIX ---
+          # Tell the action not to run a build, because we've already done it.
+          skip_app_build: true
