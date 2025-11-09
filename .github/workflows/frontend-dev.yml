@@ -16,22 +16,9 @@ jobs:
       - name: Checkout to the branch
         uses: actions/checkout@v5
         with:
-          submodules: true  # Fetches submodules
+          submodules: true
 
-      - name: Replace backend URL placeholder in staticwebapp config
-        run: |
-          # 1. Export the variable so envsubst can find it.
-          #    (Using 'export' is cleaner in a script block).
-          export BACKEND_URL=${{ secrets.BACKEND_API_URL_DEV }}
-
-          # 2. Run envsubst, writing to a new temporary file.
-          #    The '$BACKEND_URL' tells envsubst to ONLY replace this one variable.
-          envsubst '$BACKEND_URL' < ./frontend/staticwebapp.config.json > ./frontend/staticwebapp.config.json.temp
-
-          # 3. Overwrite the original file with the new one.
-          mv ./frontend/staticwebapp.config.json.temp ./frontend/staticwebapp.config.json
-
-      # 2) Install & build Vite app yourself
+      # 1. Install & build Vite app (creates ./frontend/dist)
       - name: Install dependencies
         working-directory: ./frontend
         run: npm install
@@ -40,23 +27,36 @@ jobs:
         working-directory: ./frontend
         run: npm run build
 
-      # 3) Copy the updated config into the built dist folder (THIS IS THE FIX)
+      # 2. Copy the config file from the source into the dist folder
       - name: Copy config into dist
-        working-directory: ./frontend
-        run: | 
-          cp staticwebapp.config.json dist/staticwebapp.config.json
+        run: cp ./frontend/staticwebapp.config.json ./frontend/dist/staticwebapp.config.json
 
+      # 3. Substitute the file *INSIDE* the dist folder
+      - name: Replace backend URL placeholder in final config
+        run: |
+          export BACKEND_URL=${{ secrets.BACKEND_API_URL_DEV }}
+          
+          # This is the path to the *final* file that will be deployed
+          CONFIG_FILE="./frontend/dist/staticwebapp.config.json"
+
+          envsubst '$BACKEND_URL' < $CONFIG_FILE > $CONFIG_FILE.tmp
+          mv $CONFIG_FILE.tmp $CONFIG_FILE
+
+          echo "--- Verifying final config file content ---"
+          cat $CONFIG_FILE
+
+      # 4. Deploy the dist folder
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.FRONTEND_WEB_APP_TOKEN_DEV }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "frontend/dist" # App source code path
-          api_location: "" # Api source code path - optional
-          skip_app_build: true # Set to true to skip building the app
-          ###### End of Repository/Build Configurations ######
- 
+          
+          # This points to the final folder to be deployed
+          app_location: "frontend/dist" 
+          api_location: "" 
+          
+          # We built it, so skip the action's build
+          skip_app_build: true
