@@ -2,7 +2,7 @@
   "routes": [
     {
       "route": "/api/*",
-      "rewrite": "https://mr-tracker-dev.greenplant-2cf22a25.australiaeast.azurecontainerapps.io"
+      "rewrite": "https://mr-tracker-dev.greenplant-2cf22a25.australiaeast.azurecontainerapps.io/api/*"
     },
     {
       "route": "/auth/*",
