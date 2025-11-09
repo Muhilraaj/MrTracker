@@ -33,9 +33,9 @@ jobs:
 
       # 3. Substitute the file *INSIDE* the dist folder
       - name: Replace backend URL placeholder in final config
+        env:
+          BACKEND_URL: ${{ secrets.BACKEND_API_URL_DEV }}
         run: |
-          export BACKEND_URL=${{ secrets.BACKEND_API_URL_DEV }}
-          
           # This is the path to the *final* file that will be deployed
           CONFIG_FILE="./frontend/dist/staticwebapp.config.json"
 
