@@ -22,7 +22,7 @@ jobs:
         run: |
           # 1. Export the variable so envsubst can find it.
           #    (Using 'export' is cleaner in a script block).
-          export BACKEND_URL=s
+          export BACKEND_URL=${{ secrets.BACKEND_API_URL_DEV }}
 
           # 2. Run envsubst, writing to a new temporary file.
           #    The '$BACKEND_URL' tells envsubst to ONLY replace this one variable.
@@ -30,7 +30,7 @@ jobs:
 
           # 3. Overwrite the original file with the new one.
           mv ./frontend/staticwebapp.config.json ./frontend/dist/staticwebapp.config.json
-
+      
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
