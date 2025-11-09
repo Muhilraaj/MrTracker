@@ -23,6 +23,7 @@ jobs:
         run: |
           cp ./frontend/public/staticwebapp.config.template.json ./frontend/staticwebapp.config.json
           sed -i "s|BACKEND_URL_PLACEHOLDER|${{ secrets.BACKEND_API_URL_DEV }}|g" ./frontend/staticwebapp.config.json
+          vi ./frontend/staticwebapp.config.json
       
       - name: Build And Deploy
         id: builddeploy
