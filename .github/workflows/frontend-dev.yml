@@ -56,6 +56,6 @@ jobs:
           
           # This points to the final folder to be deployed
           app_location: "frontend"
-          output_location: "dist"
+          output_location: "frontend/dist"
           skip_app_build: true
          
