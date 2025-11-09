@@ -31,21 +31,26 @@ jobs:
       - name: Copy config into dist
         run: cp ./frontend/staticwebapp.config.json ./frontend/dist/staticwebapp.config.json
 
-      # 3. Substitute the file *INSIDE* the dist folder
-      - name: Replace backend URL placeholder in final config
-        env:
-          BACKEND_URL: ${{ secrets.BACKEND_API_URL_DEV }}
+      # 3. THIS IS THE NEW, RELIABLE REPLACEMENT STEP
+      - name: Replace backend URL in final config
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          # The file to search in (the one inside /dist)
+          include: "./frontend/dist/staticwebapp.config.json"
+          
+          # The literal string to find. We MUST escape the $
+          find: '\$BACKEND_URL'
+          
+          # The value from your secret
+          replace: ${{ secrets.BACKEND_API_URL_DEV }}
+
+      # 4. Verify the file one last time
+      - name: Verify final config content
         run: |
-          # This is the path to the *final* file that will be deployed
-          CONFIG_FILE="./frontend/dist/staticwebapp.config.json"
+          echo "--- Verifying file content before deploy ---"
+          cat ./frontend/dist/staticwebapp.config.json
 
-          envsubst '$BACKEND_URL' < $CONFIG_FILE > $CONFIG_FILE.tmp
-          mv $CONFIG_FILE.tmp $CONFIG_FILE
-
-          echo "--- Verifying final config file content ---"
-          cat $CONFIG_FILE
-
-      # 4. Deploy the dist folder
+      # 5. Deploy the dist folder
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -53,9 +58,6 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.FRONTEND_WEB_APP_TOKEN_DEV }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          
-          # This points to the final folder to be deployed
-          app_location: "frontend"
-          output_location: "frontend/dist"
+          app_location: "frontend/dist" 
+          api_location: "" 
           skip_app_build: true
-         
