@@ -19,6 +19,7 @@ import type { EventActionDTO } from "../../types/types";
 import { Grid } from "@mui/material";
 import { showSnackbar } from "../../stores/slices/snackbarSlice";
 import { useDispatch } from "react-redux";
+import CircularProgress from '@mui/material/CircularProgress';
 
 export const DailyTrackerForm = () => {
     const dateUTC = moment.utc();
@@ -28,10 +29,10 @@ export const DailyTrackerForm = () => {
     const [dialogType, setDialogType] = useState<DialogActionType>(DialogAction.COMPLETE);
     const [currentEventActions, setCurrentEventActions] = useState<EventActionDTO[]>([]);
     const [selectedEventAction, setSelectedEventAction] = useState<EventActionDTO | null>(null);
-    const [postEvent] = usePostEventMutation();
+    const [postEvent,{ isLoading: isLoadingPostEvent }] = usePostEventMutation();
     const dispatch = useDispatch();
 
-    const isLoading = isLoadingActiveAction || isLoadingTodayEvents;
+    const isLoading = isLoadingActiveAction || isLoadingTodayEvents || isLoadingPostEvent;
 
     useEffect(() => {
         let currentEvents = events ? events[dateUTC.format('YYYY-MM-DD')] || [] : [];
@@ -99,6 +100,9 @@ export const DailyTrackerForm = () => {
                             </Grid>
                         ))}
                     </Grid>}
+                    {isLoading && <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+                        <CircularProgress />
+                    </Box>}
                 </Box>
                 <DialogWrapper
                     type={dialogType}
