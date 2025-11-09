@@ -26,25 +26,7 @@ jobs:
       - name: Build Vite app
         working-directory: ./frontend
         run: npm run build
-
-      # 2. Copy the config file from the source into the dist folder
-      - name: Copy config into dist
-        run: cp ./frontend/staticwebapp.config.json ./frontend/dist/staticwebapp.config.json
-
-      # 3. Substitute the file *INSIDE* the dist folder
-      - name: Replace backend URL placeholder in final config
-        env:
-          BACKEND_URL: MUHIL
-        run: |
-          # This is the path to the *final* file that will be deployed
-          CONFIG_FILE="./frontend/dist/staticwebapp.config.json"
-
-          envsubst '$BACKEND_URL' < $CONFIG_FILE > $CONFIG_FILE.tmp
-          mv $CONFIG_FILE.tmp $CONFIG_FILE
-
-          echo "--- Verifying final config file content ---"
-          cat $CONFIG_FILE
-
+        
       # 4. Deploy the dist folder
       - name: Build And Deploy
         id: builddeploy
