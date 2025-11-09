@@ -26,11 +26,11 @@ jobs:
 
           # 2. Run envsubst, writing to a new temporary file.
           #    The '$BACKEND_URL' tells envsubst to ONLY replace this one variable.
-          envsubst '$BACKEND_URL' < ./frontend/staticwebapp.config.json > ./frontend/staticwebapp.config.json
+          envsubst '$BACKEND_URL' < ./frontend/staticwebapp.config.json > ./frontend/staticwebapp.config.json.temp
 
           # 3. Overwrite the original file with the new one.
-          mv ./frontend/staticwebapp.config.json ./frontend/public/staticwebapp.config.json
-      
+          mv ./frontend/staticwebapp.config.json.temp ./frontend/public/staticwebapp.config.json
+
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
