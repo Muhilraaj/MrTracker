@@ -1,0 +1,33 @@
+name: Deploy Static Web App - Frontend - Mr Tracker Dev
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ dev ]
+    paths:
+      [ 'frontend/**', '.github/workflows/frontend-dev.yml' ]
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    name: Build and Deploy Job
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v5
+        with:
+          submodules: true
+
+      # 4. Deploy the dist folder
+      - name: Build And Deploy
+        id: builddeploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.FRONTEND_WEB_APP_TOKEN_DEV }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          
+          # This points to the final folder to be deployed
+          app_location: "frontend" 
+          api_location: "" 
+          output_location: "dist"

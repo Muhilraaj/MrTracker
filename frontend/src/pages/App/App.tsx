@@ -1,14 +1,19 @@
-import {Routes, Route} from "react-router-dom";
+import {Routes, Route, Navigate} from "react-router-dom";
 import { DailyTrackerForm } from "../DailyTracker/DailyTrackerForm";
+import SignIn from "../SignIn/SignIn";
+import SnackbarWrapper from "../../components/SnackBarWrapper";
 
-function App() {
-  const Home = () => <h1>Home Page</h1>;  
+function App() { 
 
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/tracker/daily/form" element={<DailyTrackerForm />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={ <Navigate to="/login" replace={true} />  } />
+        <Route path="/login" element={<SignIn />} />
+        <Route path="/tracker/daily/form" element={<DailyTrackerForm />} />
+      </Routes>
+      <SnackbarWrapper />
+    </>
   )
 }
 
