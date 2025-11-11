@@ -29,10 +29,6 @@ jobs:
           registryUrl: docker.io
           registryUsername: ${{ secrets.DOCKER_USERNAME }}
           registryPassword: ${{ secrets.DOCKER_PASSWORD }}
-          containerAppName: ${{secrets.REVERSE_PROXY_CONTAINER_NAME}}
+          containerAppName: ${{secrets.PROXY_CONTAINER_NAME}}
           resourceGroup:  ${{secrets.RESOURCE_GROUP_NAME_DEV}}
-          imageToBuild: ${{secrets.REVERSE_PROXY_IMAGE_NAME_DEV}}:latest
-          
-
-     
-
+          imageToBuild: ${{secrets.PROXY_IMAGE_NAME_DEV}}:latest
