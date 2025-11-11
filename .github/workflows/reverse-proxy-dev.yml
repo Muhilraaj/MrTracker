@@ -6,7 +6,7 @@ on:
     branches: 
       [ dev ]
     paths:
-      [ 'reverseProxy/**', '.github/workflows/reverse_proxy_dev.yml' ]
+      [ 'reverseProxy/**', '.github/workflows/reverse-proxy-dev.yml' ]
       
 jobs:
   build-and-deploy:
@@ -29,8 +29,8 @@ jobs:
           registryUrl: docker.io
           registryUsername: ${{ secrets.DOCKER_USERNAME }}
           registryPassword: ${{ secrets.DOCKER_PASSWORD }}
-          containerAppName: mytracker
-          resourceGroup: de
+          containerAppName: ${{secrets.REVERSE_PROXY_CONTAINER_NAME}}
+          resourceGroup:  ${{secrets.RESOURCE_GROUP_NAME_DEV}}
           imageToBuild: ${{secrets.REVERSE_PROXY_IMAGE_NAME_DEV}}:latest
           
 
