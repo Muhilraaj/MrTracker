@@ -1,0 +1,38 @@
+name: Deploy Container - Reverse Proxy - My Tracker Dev
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ dev ]
+    paths:
+      [ 'reverseProxy/**', '.github/workflows/reverse_proxy_dev.yml' ]
+      
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }}/reverseProxy
+          environmentVariables: FRONTEND_URL=${{ secrets.FRONTEND_URL_DEV }} BACKEND_URL=${{ secrets.BACKEND_API_URL_DEV }}
+          registryUrl: docker.io
+          registryUsername: ${{ secrets.DOCKER_USERNAME }}
+          registryPassword: ${{ secrets.DOCKER_PASSWORD }}
+          containerAppName: mytracker
+          resourceGroup: de
+          imageToBuild: ${{secrets.REVERSE_PROXY_IMAGE_NAME_DEV}}:latest
+          
+
+     
+
