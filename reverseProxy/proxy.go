@@ -58,6 +58,6 @@ func main() {
 	route.Any("/", frontendProxy)
 	route.GET("/static/*path", frontendProxy)
 	route.GET("/manifest.json", frontendProxy)
-	route.GET("/logo192.png", frontendProxy)
+	route.GET("/index-Cwet1372.js", frontendProxy) // Serve index-Cwet1372.js instead of index.js
 	route.Run(":443")
 }

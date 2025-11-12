@@ -8,9 +8,9 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={ <Navigate to="/login" replace={true} />  } />
-        <Route path="/login" element={<SignIn />} />
-        <Route path="/tracker/daily/form" element={<DailyTrackerForm />} />
+        <Route path="/" element={ <Navigate to="/page/login" replace={true} />  } />
+        <Route path="/page/login" element={<SignIn />} />
+        <Route path="/page/tracker/daily/form" element={<DailyTrackerForm />} />
       </Routes>
       <SnackbarWrapper />
     </>
