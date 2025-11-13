@@ -58,8 +58,6 @@ func main() {
 	route.Any("/", frontendProxy)
 	route.GET("/static/*path", frontendProxy)
 	route.GET("/manifest.json", frontendProxy)
-	route.GET("/*.js", frontendProxy) 
-	route.GET("/*.png", frontendProxy)
-	route.GET("/*.ico", frontendProxy)
+	route.NoRoute(frontendProxy)
 	route.Run(":443")
 }
