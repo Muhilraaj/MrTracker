@@ -50,7 +50,7 @@ export default function SignIn() {
       dispatch(showSnackbar({ message: 'Login successful', type: 'success' }));
       navigate('/page/tracker/daily/form');
       setInterval(() => {
-        navigate('/login');
+        navigate('/page/login');
       }, resp.expiryMinutes * 60 * 1000);
     } catch (err: any) {
       // Error handling is done in useEffect
