@@ -48,9 +48,9 @@ export default function SignIn() {
         password: data.get('password') as string,
       }).unwrap();
       dispatch(showSnackbar({ message: 'Login successful', type: 'success' }));
-      navigate('/tracker/daily/form');
+      navigate('/page/tracker/daily/form');
       setInterval(() => {
-        navigate('/login');
+        navigate('/page/login');
       }, resp.expiryMinutes * 60 * 1000);
     } catch (err: any) {
       // Error handling is done in useEffect

@@ -1,12 +1,12 @@
-name: Deploy Container - Backend - Mr Tracker Dev
+name: Deploy Container - Backend - Mr Tracker Prod
 # When this action will be executed
 on:
   # Automatically trigger it when detected changes in repo
   push:
     branches: 
-      [ dev ]
+      [ main ]
     paths:
-      [ 'backend/**', '.github/workflows/backend-dev.yml' ]
+      [ 'backend/**', '.github/workflows/backend-prod.yml' ]
 
 
 jobs:
@@ -30,20 +30,20 @@ jobs:
       - name: Azure Login
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
+          creds: ${{ secrets.AZURE_CREDENTIALS_PROD }}
 
       - name: Build and push container image to registry
         uses: azure/container-apps-deploy-action@v2
         with:
           appSourcePath: ${{ github.workspace }}/backend
-          environmentVariables: spring.data.mongodb.uri=${{secrets.AZURE_MONGO_URI}} spring.data.mongodb.database=${{secrets.MONGO_DB_NAME_DEV}} jwt.secret=${{secrets.JWT_SECRET}} jwt.expiration=${{secrets.JWT_EXPIRATION}}
+          environmentVariables: spring.data.mongodb.uri=${{secrets.AZURE_MONGO_URI}} spring.data.mongodb.database=${{secrets.MONGO_DB_NAME_PROD}} jwt.secret=${{secrets.JWT_SECRET}} jwt.expiration=${{secrets.JWT_EXPIRATION}}
           registryUrl: docker.io
           registryUsername: ${{ secrets.DOCKER_USERNAME }}
           registryPassword: ${{ secrets.DOCKER_PASSWORD }}
           containerAppName:  ${{secrets.BACKEND_CONTAINER_NAME}}
-          resourceGroup: ${{secrets.RESOURCE_GROUP_NAME_DEV}}
-          imageToBuild: ${{secrets.BACKEND_IMAGE_NAME_DEV}}:latest
-          
+          resourceGroup: ${{secrets.RESOURCE_GROUP_NAME_PROD}}
+          imageToBuild: ${{secrets.BACKEND_IMAGE_NAME_PROD}}:latest
+
 
      
 
