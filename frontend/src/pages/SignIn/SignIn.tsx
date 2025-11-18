@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLoginMutation } from '../../stores/api/auth';
 import { showSnackbar } from '../../stores/slices/snackbarSlice';
 import { useDispatch } from 'react-redux';
+import CircularProgress from '@mui/material/CircularProgress';
 
 
 function Copyright(props: any) {
@@ -37,7 +38,8 @@ function Copyright(props: any) {
 export default function SignIn() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [login] = useLoginMutation();
+  const [login,{isLoading: isLoadingLogin}] = useLoginMutation();
+  const isLoading = isLoadingLogin;
 
   const handleSubmit = async (event: React.SyntheticEvent) => {
     try {
@@ -106,9 +108,13 @@ export default function SignIn() {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
+              disabled={isLoading}
             >
               Sign In
             </Button>
+            {isLoading && <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+                        <CircularProgress />
+            </Box>}
             <Grid container>
               <Grid>
                 <Link href="#" variant="body2">
