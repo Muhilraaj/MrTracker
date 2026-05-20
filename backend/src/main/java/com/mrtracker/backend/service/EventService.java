@@ -6,6 +6,7 @@ import com.mrtracker.backend.repository.EventRepo;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,13 @@ public class EventService {
     }
 
     public void postEvent(Event event){
+        Instant requestedEventDate = event.getEventDate() != null ? event.getEventDate() : Instant.now();
+        Instant normalizedEventDate = requestedEventDate
+                .atOffset(ZoneOffset.UTC)
+                .toLocalDate()
+                .atStartOfDay()
+                .toInstant(ZoneOffset.UTC);
+        event.setEventDate(normalizedEventDate);
         event.setUpdatedDate(Instant.now());
         eventRepo.upsert(event);
     }
