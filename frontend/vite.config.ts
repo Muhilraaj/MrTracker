@@ -5,7 +5,6 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
-    allowedHosts: ['host.docker.internal'],
     proxy: {
       '/api': {
         target: 'http://localhost:8080',
