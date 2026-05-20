@@ -7,6 +7,7 @@ on:
       [ main ]
     paths:
       [ 'reverseProxy/**', '.github/workflows/reverse-proxy-prod.yml' ]
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:

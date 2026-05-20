@@ -6,8 +6,6 @@ import com.mrtracker.backend.service.EventService;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 
@@ -34,11 +32,6 @@ public class EventController {
 
     @PostMapping
     public void postEvent(@RequestBody Event event){
-        if(event.getEventDate()==null){
-            event.setEventDate(LocalDate.now()
-                    .atStartOfDay(ZoneOffset.UTC)
-                    .toInstant());
-        }
         eventService.postEvent(event);
     }
 }

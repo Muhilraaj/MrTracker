@@ -1,6 +1,6 @@
 import { ThemeProvider } from "@emotion/react";
 import { useGetActionsQuery } from "../../stores/api/action";
-import { DateField } from '@mui/x-date-pickers/DateField';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import theme from '../../assets/theme';
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -23,8 +23,19 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 export const DailyTrackerForm = () => {
     const dateUTC = moment.utc();
+    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+    const selectedDateUTC = moment.utc(
+        moment(selectedDate ?? new Date()).format('YYYY-MM-DD'),
+        'YYYY-MM-DD'
+    );
+    const selectedDateKey = selectedDateUTC.format('YYYY-MM-DD');
+    const minSelectableDate = dateUTC.clone().subtract(6, "days").toDate();
+    const maxSelectableDate = dateUTC.clone().toDate();
     const { data: activeAction, isLoading: isLoadingActiveAction } = useGetActionsQuery({ active: true });
-    const { data: events, isLoading: isLoadingTodayEvents } = useGetEventsQuery({ startDate: dateUTC.startOf('day').toISOString(), endDate: dateUTC.endOf('day').toISOString() });
+    const { data: events, isLoading: isLoadingTodayEvents } = useGetEventsQuery({
+        startDate: selectedDateUTC.clone().startOf('day').toISOString(),
+        endDate: selectedDateUTC.clone().endOf('day').toISOString()
+    });
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogType, setDialogType] = useState<DialogActionType>(DialogAction.COMPLETE);
     const [currentEventActions, setCurrentEventActions] = useState<EventActionDTO[]>([]);
@@ -35,14 +46,14 @@ export const DailyTrackerForm = () => {
     const isLoading = isLoadingActiveAction || isLoadingTodayEvents || isLoadingPostEvent;
 
     useEffect(() => {
-        let currentEvents = events ? events[dateUTC.format('YYYY-MM-DD')] || [] : [];
+        let currentEvents = events ? events[selectedDateKey] || [] : [];
         const eventActions: EventActionDTO[] = [];
         activeAction?.forEach((action) => {
             const matchedEvent = currentEvents.find((event) => event.actionId === action.id);
             eventActions.push({ actionId: action.id, status: matchedEvent?.status || 20, prompt: action.prompt });
         });
         setCurrentEventActions(eventActions);
-    }, [events, activeAction]);
+    }, [events, activeAction, selectedDateKey]);
 
     const handleOpenDialog = (type: DialogActionType, eventActionDTO: EventActionDTO) => {
         setDialogType(type);
@@ -55,7 +66,8 @@ export const DailyTrackerForm = () => {
         try {
             postEvent({
                 actionId: selectedEventAction?.actionId || '',
-                status: selectedEventAction?.status || 10
+                status: selectedEventAction?.status || 10,
+                eventDate: selectedDateUTC.toDate(),
             }).unwrap();
             setOpenDialog(false);
             dispatch(showSnackbar({ message: 'Event updated successfully', type: 'success' }));
@@ -83,11 +95,18 @@ export const DailyTrackerForm = () => {
                     flexDirection={'column'}
                 >
                     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                        <DateField
-                            label="Today's Date"
-                            defaultValue={new Date()}
-                            readOnly
+                        <DatePicker
+                            label="Select Date"
+                            value={selectedDate}
+                            onChange={(newValue) => setSelectedDate(newValue)}
+                            minDate={minSelectableDate}
+                            maxDate={maxSelectableDate}
                             format="MMMM dd, yyyy"
+                            slotProps={{
+                                textField: {
+                                    sx: { minWidth: 240 }
+                                }
+                            }}
                         />
                     </Box>
                     {!isLoading && <Grid container spacing={2} >
