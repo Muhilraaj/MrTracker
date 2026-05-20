@@ -24,7 +24,10 @@ import CircularProgress from '@mui/material/CircularProgress';
 export const DailyTrackerForm = () => {
     const dateUTC = moment.utc();
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-    const selectedDateUTC = moment.utc(selectedDate ?? new Date());
+    const selectedDateUTC = moment.utc(
+        moment(selectedDate ?? new Date()).format('YYYY-MM-DD'),
+        'YYYY-MM-DD'
+    );
     const selectedDateKey = selectedDateUTC.format('YYYY-MM-DD');
     const minSelectableDate = dateUTC.clone().subtract(6, "days").toDate();
     const maxSelectableDate = dateUTC.clone().toDate();
@@ -64,7 +67,7 @@ export const DailyTrackerForm = () => {
             postEvent({
                 actionId: selectedEventAction?.actionId || '',
                 status: selectedEventAction?.status || 10,
-                eventDate: selectedDate
+                eventDate: selectedDateUTC.toDate(),
             }).unwrap();
             setOpenDialog(false);
             dispatch(showSnackbar({ message: 'Event updated successfully', type: 'success' }));
