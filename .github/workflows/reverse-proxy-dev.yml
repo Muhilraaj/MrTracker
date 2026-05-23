@@ -3,19 +3,35 @@ name: Deploy Container - Reverse Proxy - My Tracker Dev
 on:
   # Automatically trigger it when detected changes in repo
   push:
-    branches: 
-      [ dev ]
+    branches:
+      - dev
     paths:
-      [ 'reverseProxy/**', '.github/workflows/reverse-proxy-dev.yml' ]
+      - 'reverseProxy/**'
+      - '.github/workflows/reverse-proxy-dev.yml'
+  pull_request:
+    types:
+      - closed
+    branches:
+      - dev
+    paths:
+      - 'reverseProxy/**'
+      - '.github/workflows/reverse-proxy-dev.yml'
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-dev
+  cancel-in-progress: true
 
 jobs:
   build-and-deploy:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout to the branch
         uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.merge_commit_sha || github.sha }}
 
       - name: Azure Login
         uses: azure/login@v1
