@@ -3,35 +3,20 @@ name: Deploy Container - Backend - Mr Tracker Dev
 on:
   # Automatically trigger it when detected changes in repo
   push:
-    branches:
-      - dev
+    branches: 
+      [ dev ]
     paths:
-      - 'backend/**'
-      - '.github/workflows/backend-dev.yml'
-  pull_request:
-    types:
-      - closed
-    branches:
-      - dev
-    paths:
-      - 'backend/**'
-      - '.github/workflows/backend-dev.yml'
+      [ 'backend/**', '.github/workflows/backend-dev.yml' ]
   workflow_dispatch:
 
-concurrency:
-  group: ${{ github.workflow }}-dev
-  cancel-in-progress: true
 
 jobs:
   build-and-deploy:
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout to the branch
         uses: actions/checkout@v5
-        with:
-          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.merge_commit_sha || github.sha }}
       
       - name: Setup Java
         uses: actions/setup-java@v5
