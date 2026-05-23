@@ -45,17 +45,21 @@ export const MonthlyEventsTable = ({
 }: MonthlyEventsTableProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
+  const stickyBg = theme.palette.common.white;
+  const rowHoverBg = '#f6f9ff';
   const stickyShadow = 'inset -1px 0 0 rgba(0, 0, 0, 0.06), 4px 0 12px -6px rgba(0, 0, 0, 0.12)';
 
-  const getDateCellBg = (key: string) => {
-    if (key === todayKey) return 'rgba(0, 68, 255, 0.06)';
-    return 'background.paper';
-  };
-
-  const getDateHeaderBg = (key: string) => {
-    if (key === todayKey) return 'rgba(0, 68, 255, 0.08)';
-    return 'background.paper';
+  const stickyTaskCellSx = {
+    position: 'sticky' as const,
+    left: 0,
+    bgcolor: stickyBg,
+    backgroundColor: stickyBg,
+    boxShadow: stickyShadow,
+    isolation: 'isolate' as const,
+    '.MuiTableRow-hover:hover &': {
+      bgcolor: rowHoverBg,
+      backgroundColor: rowHoverBg,
+    },
   };
 
   return (
@@ -83,12 +87,9 @@ export const MonthlyEventsTable = ({
               <TableCell
                 sx={{
                   ...headerCellSx,
-                  position: 'sticky',
-                  left: 0,
-                  zIndex: 4,
-                  bgcolor: 'background.paper',
+                  ...stickyTaskCellSx,
+                  zIndex: 5,
                   minWidth: isMobile ? 120 : 200,
-                  boxShadow: stickyShadow,
                 }}
               >
                 Task
@@ -105,7 +106,8 @@ export const MonthlyEventsTable = ({
                       minWidth: isMobile ? 44 : 40,
                       width: isMobile ? 44 : 40,
                       px: isMobile ? 0.25 : 0.5,
-                      bgcolor: getDateHeaderBg(key),
+                      bgcolor: stickyBg,
+                      backgroundColor: stickyBg,
                       color: isToday ? 'secondary.main' : 'text.secondary',
                       fontWeight: isToday ? 700 : 600,
                       fontSize: isMobile ? '0.8rem' : '0.75rem',
@@ -117,7 +119,34 @@ export const MonthlyEventsTable = ({
                       }),
                     }}
                   >
-                    {day.format('D')}
+                    <Tooltip title={day.format('dddd, MMM D')} arrow>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          lineHeight: 1.1,
+                          gap: 0.25,
+                        }}
+                      >
+                        {!isMobile && (
+                          <Typography
+                            component="span"
+                            sx={{
+                              fontSize: '0.6rem',
+                              fontWeight: 600,
+                              opacity: 0.85,
+                              textTransform: 'uppercase',
+                            }}
+                          >
+                            {day.format('dd')}
+                          </Typography>
+                        )}
+                        <Typography component="span" sx={{ fontWeight: 'inherit', fontSize: 'inherit' }}>
+                          {day.format('D')}
+                        </Typography>
+                      </Box>
+                    </Tooltip>
                   </TableCell>
                 );
               })}
@@ -125,78 +154,77 @@ export const MonthlyEventsTable = ({
           </TableHead>
           <TableBody>
             {rows.map((row) => (
-                <TableRow
-                  key={row.actionId}
-                  hover
+              <TableRow
+                key={row.actionId}
+                hover
+                sx={{
+                  bgcolor: stickyBg,
+                  transition: 'background-color 0.15s ease',
+                  '&:hover': { bgcolor: rowHoverBg },
+                  '&:last-child td': { borderBottom: 0 },
+                }}
+              >
+                <TableCell
                   sx={{
-                    bgcolor: 'background.paper',
-                    transition: 'background-color 0.15s ease',
-                    '&:hover': { bgcolor: 'rgba(0, 68, 255, 0.03)' },
-                    '&:last-child td': { borderBottom: 0 },
+                    ...stickyTaskCellSx,
+                    zIndex: 3,
+                    minWidth: isMobile ? 120 : 200,
+                    maxWidth: isMobile ? 120 : 240,
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                    py: isMobile ? 1 : 1.25,
                   }}
                 >
-                  <TableCell
-                    sx={{
-                      position: 'sticky',
-                      left: 0,
-                      zIndex: 2,
-                      bgcolor: 'background.paper',
-                      minWidth: isMobile ? 120 : 200,
-                      maxWidth: isMobile ? 120 : 240,
-                      borderBottom: '1px solid',
-                      borderColor: 'divider',
-                      boxShadow: stickyShadow,
-                      py: isMobile ? 1 : 1.25,
-                      transition: 'background-color 0.15s ease',
-                      '.MuiTableRow-hover:hover &': { bgcolor: 'rgba(0, 68, 255, 0.03)' },
-                    }}
-                  >
-                    <Tooltip title={row.prompt} arrow placement="right">
-                      <Typography
-                        variant="body2"
-                        noWrap
-                        sx={{
-                          maxWidth: isMobile ? 110 : 220,
-                          fontWeight: 500,
-                          color: 'text.primary',
-                        }}
-                      >
-                        {row.prompt}
-                      </Typography>
-                    </Tooltip>
-                  </TableCell>
-                  {dateKeys.map((key) => (
-                    <TableCell
-                      key={key}
-                      align="center"
+                  <Tooltip title={row.prompt} arrow placement="right">
+                    <Typography
+                      variant="body2"
+                      noWrap
                       sx={{
-                        minWidth: isMobile ? 44 : 40,
-                        width: isMobile ? 44 : 40,
-                        px: isMobile ? 0.25 : 0.5,
-                        py: isMobile ? 0.5 : 0.75,
-                        borderBottom: '1px solid',
-                        borderColor: 'divider',
-                        bgcolor: getDateCellBg(key),
-                        transition: 'background-color 0.15s ease',
-                        ...(key === todayKey && {
-                          boxShadow: 'inset 0 0 0 1px rgba(0, 68, 255, 0.12)',
-                        }),
+                        maxWidth: isMobile ? 110 : 220,
+                        fontWeight: 500,
+                        color: 'text.primary',
                       }}
                     >
-                      <EventStatusCell
-                        status={row.cells[key]}
-                        dateKey={key}
-                        prompt={row.prompt}
-                        isMobile={isMobile}
-                        onAction={
-                          onCellAction
-                            ? (type) => onCellAction(row.actionId, row.prompt, key, type)
-                            : undefined
-                        }
-                      />
-                    </TableCell>
-                  ))}
-                </TableRow>
+                      {row.prompt}
+                    </Typography>
+                  </Tooltip>
+                </TableCell>
+                {dateKeys.map((key) => (
+                  <TableCell
+                    key={key}
+                    align="center"
+                    sx={{
+                      minWidth: isMobile ? 44 : 40,
+                      width: isMobile ? 44 : 40,
+                      px: isMobile ? 0.25 : 0.5,
+                      py: isMobile ? 0.5 : 0.75,
+                      borderBottom: '1px solid',
+                      borderColor: 'divider',
+                      bgcolor: stickyBg,
+                      backgroundColor: stickyBg,
+                      zIndex: 0,
+                      transition: 'background-color 0.15s ease',
+                      '.MuiTableRow-hover:hover &': {
+                        bgcolor: rowHoverBg,
+                        backgroundColor: rowHoverBg,
+                      },
+                    }}
+                  >
+                    <EventStatusCell
+                      status={row.cells[key]}
+                      dateKey={key}
+                      prompt={row.prompt}
+                      isMobile={isMobile}
+                      readOnly={key !== todayKey}
+                      onAction={
+                        onCellAction && key === todayKey
+                          ? (type) => onCellAction(row.actionId, row.prompt, key, type)
+                          : undefined
+                      }
+                    />
+                  </TableCell>
+                ))}
+              </TableRow>
             ))}
           </TableBody>
         </Table>

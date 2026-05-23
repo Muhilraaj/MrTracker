@@ -17,10 +17,18 @@ interface EventStatusCellProps {
   dateKey: string;
   prompt: string;
   isMobile?: boolean;
+  readOnly?: boolean;
   onAction?: (type: DialogActionType) => void;
 }
 
-export const EventStatusCell = ({ status, dateKey, prompt, isMobile = false, onAction }: EventStatusCellProps) => {
+export const EventStatusCell = ({
+  status,
+  dateKey,
+  prompt,
+  isMobile = false,
+  readOnly = false,
+  onAction,
+}: EventStatusCellProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const isPending = status === 20;
@@ -98,8 +106,10 @@ export const EventStatusCell = ({ status, dateKey, prompt, isMobile = false, onA
   const statusLabel = isPastPending ? 'Missed' : (STATUS_LABELS[status] ?? 'Unknown');
   const tooltipTitle = `${statusLabel} — ${formattedDate}`;
 
+  const isInteractive = !readOnly && Boolean(onAction);
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    if (!onAction) return;
+    if (!isInteractive || !onAction) return;
     setAnchorEl(event.currentTarget);
   };
 
@@ -119,7 +129,7 @@ export const EventStatusCell = ({ status, dateKey, prompt, isMobile = false, onA
         mx: 'auto',
       }}
     >
-      {onAction ? (
+      {isInteractive ? (
         <IconButton
           aria-label={`${prompt} on ${formattedDate}`}
           onClick={handleClick}
@@ -147,7 +157,7 @@ export const EventStatusCell = ({ status, dateKey, prompt, isMobile = false, onA
       <Tooltip title={tooltipTitle} arrow>
         {cellContent}
       </Tooltip>
-      {onAction && (
+      {isInteractive && (
         <Menu
           anchorEl={anchorEl}
           open={open}

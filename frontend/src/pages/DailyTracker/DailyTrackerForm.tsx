@@ -78,7 +78,6 @@ export const DailyTrackerForm = () => {
 
                 <Box sx={{ display: 'flex', gap: 3, height: '100%', alignContent: 'stretch' }} p={4}
                     display="flex"
-                    border='solid'
                     flexDirection={'column'}
                 >
                     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
