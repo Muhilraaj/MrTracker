@@ -2,12 +2,8 @@ import { ThemeProvider } from "@emotion/react";
 import { useGetActionsQuery } from "../../stores/api/action";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import theme from '../../assets/theme';
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import { TrackerAppBar } from "../../components/TrackerAppBar";
 import { ToDoCard } from "../../components/ToDoCard";
 import DialogWrapper from "../../components/DialogWrapper";
 import { useEffect, useState } from "react";
@@ -78,20 +74,10 @@ export const DailyTrackerForm = () => {
     return (
         <ThemeProvider theme={theme}>
             <Box sx={{ flexGrow: 1, gap: 2 }} display='flex' flexDirection='column' alignItems='stretch'>
-                <AppBar position="static" sx={{ width: '100%' }}>
-                    <Toolbar variant="dense">
-                        <IconButton edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
-                            <MenuIcon />
-                        </IconButton>
-                        <Typography variant="h6" color="inherit" component="div">
-                            Daily Tracker Form
-                        </Typography>
-                    </Toolbar>
-                </AppBar>
+                <TrackerAppBar title="Daily Tracker Form" />
 
                 <Box sx={{ display: 'flex', gap: 3, height: '100%', alignContent: 'stretch' }} p={4}
                     display="flex"
-                    border='solid'
                     flexDirection={'column'}
                 >
                     <Box sx={{ display: 'flex', justifyContent: 'center' }}>

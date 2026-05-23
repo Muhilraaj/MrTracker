@@ -29,6 +29,15 @@ public class AuthController {
         this.passwordEncoder=passwordEncoder;
     }
 
+    @GetMapping("/login")
+    public ResponseEntity<Map<String, String>> loginInfo() {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+                .body(Map.of(
+                        "error", "GET is not supported on /auth/login",
+                        "hint", "Open /page/login in the browser or send a POST request with username and password"
+                ));
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request, HttpServletResponse response) {
         authManager.authenticate(
@@ -64,8 +73,8 @@ public class AuthController {
         // ✅ Create user object
         User user = new User();
         user.setUsername(request.getUsername());
-        user.setPassword(hashedPassword); // <-- Argon2 stored here
-        user.setRole(request.getRole());
+        user.setPassword(hashedPassword);
+        user.setRole(request.getRole() != null ? request.getRole() : "USER");
 
         // ✅ Save in MongoDB
         userRepository.save(user);
@@ -78,6 +87,6 @@ public class AuthController {
 class   AuthRequest {
     private String username;
     private String password;
-    private String Role;
+    private String role;
     // getters & setters
 }
