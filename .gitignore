@@ -137,4 +137,7 @@ application-*.yaml
 application-*.properties
 application.properties
 application.yml
-application.yaml    
+application.yaml
+
+# === Scripts ===
+scripts/
