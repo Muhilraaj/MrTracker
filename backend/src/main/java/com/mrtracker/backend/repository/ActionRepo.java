@@ -7,6 +7,6 @@ import java.util.List;
 
 @Repository
 public interface ActionRepo extends MongoRepository<Action, String> {
-    List<Action> findByActiveTrueAndTypeOrderBySequence(String type);
-    List<Action> findByTypeOrderBySequence(String type);
+    List<Action> findByActiveTrueAndTypeOrderByPriorityDescSequenceAsc(String type);
+    List<Action> findByTypeOrderByPriorityDescSequenceAsc(String type);
 }

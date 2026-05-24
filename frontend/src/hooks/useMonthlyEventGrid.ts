@@ -7,6 +7,7 @@ export interface MonthlyRow {
   actionId: string;
   prompt: string;
   sequence: number;
+  priority: boolean;
   cells: Record<string, number>;
 }
 
@@ -46,6 +47,7 @@ export const useMonthlyEventGrid = () => {
         actionId: action.id,
         prompt: action.prompt,
         sequence: action.sequence,
+        priority: action.priority ?? false,
         cells,
       };
     });

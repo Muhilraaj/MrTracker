@@ -8,6 +8,7 @@ interface Action {
     type:string;
     active: boolean;
     sequence: number;
+    priority: boolean;
 }
 
 interface Event {
@@ -49,6 +50,7 @@ export interface EventActionDTO{
     actionId: string;
     status: number;
     prompt: string;
+    priority: boolean;
 }
 
 export type AuthBody = {

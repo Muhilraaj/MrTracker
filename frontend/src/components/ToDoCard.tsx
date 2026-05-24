@@ -5,12 +5,14 @@ import {
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useState } from "react";
 import type { DialogActionType, ToDoProps } from "../types/types";
-import { actionStatusColorMap, DialogAction } from "../constants/constants";
+import { actionStatusColorMap, DialogAction, priorityActionStyles } from "../constants/constants";
 
 export const ToDoCard = (props: ToDoProps) => {
   const { eventActionDTO } = props;
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const isPriority = eventActionDTO.priority;
+  const statusColor = actionStatusColorMap[eventActionDTO?.status || 10];
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -25,18 +27,25 @@ export const ToDoCard = (props: ToDoProps) => {
   }
   const isPending: boolean = eventActionDTO.status === 20;
   return (
-    <Card sx={{ borderRadius: 2, border: 1, borderColor: actionStatusColorMap[eventActionDTO?.status || 10] }}>
+    <Card sx={{
+      borderRadius: 2,
+      border: isPriority
+        ? `${priorityActionStyles.borderWidth}px solid ${priorityActionStyles.edgeColor}`
+        : 1,
+      borderColor: isPriority ? priorityActionStyles.edgeColor : statusColor,
+      bgcolor: isPriority ? priorityActionStyles.bgcolor : undefined,
+    }}>
       <CardHeader sx={{ pl: 4 }} title={<Typography
         variant="h6"
-        fontWeight={200}
+        fontWeight={isPriority ? priorityActionStyles.fontWeight : 200}
         sx={{
-          textDecoration: isPending ? 'none' : 'line-through', // 👈 strikes the text
-          color: actionStatusColorMap[eventActionDTO?.status || 10],
+          textDecoration: isPending ? 'none' : 'line-through',
+          color: statusColor,
         }}
       >
         {eventActionDTO.prompt}
       </Typography>}
-        action={<IconButton aria-label="settings" sx={{ pl: 4, color: actionStatusColorMap[eventActionDTO?.status || 10] }} onClick={handleMenuOpen}><MoreVertIcon /></IconButton>} />
+        action={<IconButton aria-label="settings" sx={{ pl: 4, color: statusColor }} onClick={handleMenuOpen}><MoreVertIcon /></IconButton>} />
       <Menu
         anchorEl={anchorEl}
         open={open}

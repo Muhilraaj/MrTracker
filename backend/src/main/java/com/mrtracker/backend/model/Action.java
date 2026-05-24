@@ -23,4 +23,6 @@ public class Action {
     private Boolean active;
     @JsonProperty
     private int sequence;
+    @JsonProperty
+    private Boolean priority = false;
 }

@@ -46,7 +46,12 @@ export const DailyTrackerForm = () => {
         const eventActions: EventActionDTO[] = [];
         activeAction?.forEach((action) => {
             const matchedEvent = currentEvents.find((event) => event.actionId === action.id);
-            eventActions.push({ actionId: action.id, status: matchedEvent?.status || 20, prompt: action.prompt });
+            eventActions.push({
+                actionId: action.id,
+                status: matchedEvent?.status || 20,
+                prompt: action.prompt,
+                priority: action.priority ?? false,
+            });
         });
         setCurrentEventActions(eventActions);
     }, [events, activeAction, selectedDateKey]);
@@ -54,7 +59,12 @@ export const DailyTrackerForm = () => {
     const handleOpenDialog = (type: DialogActionType, eventActionDTO: EventActionDTO) => {
         setDialogType(type);
         setOpenDialog(true);
-        setSelectedEventAction({ actionId: eventActionDTO.actionId, status: type === DialogAction.COMPLETE ? 30 : type === DialogAction.CANCEL ? 10 : 20, prompt: eventActionDTO.prompt });
+        setSelectedEventAction({
+            actionId: eventActionDTO.actionId,
+            status: type === DialogAction.COMPLETE ? 30 : type === DialogAction.CANCEL ? 10 : 20,
+            prompt: eventActionDTO.prompt,
+            priority: eventActionDTO.priority,
+        });
     }
 
     const onSubmitDialog = () => {
