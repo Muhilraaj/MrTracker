@@ -4,6 +4,13 @@ export const actionStatusColorMap: { [key: number]: string } = {
     30: 'success.main'  // Completed
 };
 
+export const priorityActionStyles = {
+    borderWidth: 2,
+    edgeColor: '#D4AF37',
+    bgcolor: '#FFFBF0',
+    fontWeight: 600,
+} as const;
+
 
 
 

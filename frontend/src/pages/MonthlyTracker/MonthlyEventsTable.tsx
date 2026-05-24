@@ -16,6 +16,8 @@ import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import moment from 'moment';
 import { EventStatusCell } from '../../components/EventStatusCell';
+import { priorityActionStyles } from '../../constants/constants';
+import { ACTION_NOT_APPLICABLE_STATUS } from '../../utils/actionDate';
 import type { MonthlyRow } from '../../hooks/useMonthlyEventGrid';
 import type { DialogActionType } from '../../types/types';
 
@@ -158,8 +160,12 @@ export const MonthlyEventsTable = ({
                 key={row.actionId}
                 hover
                 sx={{
-                  bgcolor: stickyBg,
+                  bgcolor: row.priority ? priorityActionStyles.bgcolor : stickyBg,
                   transition: 'background-color 0.15s ease',
+                  ...(row.priority && {
+                    boxShadow: `inset 0 0 0 ${priorityActionStyles.borderWidth}px ${priorityActionStyles.edgeColor}`,
+                  }),
+                  ...(!row.active && { opacity: 0.85 }),
                   '&:hover': { bgcolor: rowHoverBg },
                   '&:last-child td': { borderBottom: 0 },
                 }}
@@ -172,7 +178,13 @@ export const MonthlyEventsTable = ({
                     maxWidth: isMobile ? 120 : 240,
                     borderBottom: '1px solid',
                     borderColor: 'divider',
+                    bgcolor: row.priority ? priorityActionStyles.bgcolor : stickyBg,
+                    backgroundColor: row.priority ? priorityActionStyles.bgcolor : stickyBg,
                     py: isMobile ? 1 : 1.25,
+                    '.MuiTableRow-hover:hover &': {
+                      bgcolor: row.priority ? priorityActionStyles.bgcolor : rowHoverBg,
+                      backgroundColor: row.priority ? priorityActionStyles.bgcolor : rowHoverBg,
+                    },
                   }}
                 >
                   <Tooltip title={row.prompt} arrow placement="right">
@@ -181,7 +193,7 @@ export const MonthlyEventsTable = ({
                       noWrap
                       sx={{
                         maxWidth: isMobile ? 110 : 220,
-                        fontWeight: 500,
+                        fontWeight: row.priority ? priorityActionStyles.fontWeight : 500,
                         color: 'text.primary',
                       }}
                     >
@@ -200,8 +212,8 @@ export const MonthlyEventsTable = ({
                       py: isMobile ? 0.5 : 0.75,
                       borderBottom: '1px solid',
                       borderColor: 'divider',
-                      bgcolor: stickyBg,
-                      backgroundColor: stickyBg,
+                      bgcolor: row.priority ? priorityActionStyles.bgcolor : stickyBg,
+                      backgroundColor: row.priority ? priorityActionStyles.bgcolor : stickyBg,
                       zIndex: 0,
                       transition: 'background-color 0.15s ease',
                       '.MuiTableRow-hover:hover &': {
@@ -215,9 +227,13 @@ export const MonthlyEventsTable = ({
                       dateKey={key}
                       prompt={row.prompt}
                       isMobile={isMobile}
-                      readOnly={key !== todayKey}
+                      readOnly={
+                        key !== todayKey
+                        || !row.active
+                        || row.cells[key] === ACTION_NOT_APPLICABLE_STATUS
+                      }
                       onAction={
-                        onCellAction && key === todayKey
+                        onCellAction && key === todayKey && row.active
                           ? (type) => onCellAction(row.actionId, row.prompt, key, type)
                           : undefined
                       }
