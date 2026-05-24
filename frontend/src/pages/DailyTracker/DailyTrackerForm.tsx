@@ -12,6 +12,7 @@ import { DialogAction } from "../../constants/constants";
 import { useGetEventsQuery, usePostEventMutation } from "../../stores/api/event";
 import moment from "moment";
 import type { EventActionDTO } from "../../types/types";
+import { isActionVisibleOnDate } from "../../utils/actionDate";
 import { Grid } from "@mui/material";
 import { showSnackbar } from "../../stores/slices/snackbarSlice";
 import { useDispatch } from "react-redux";
@@ -27,7 +28,10 @@ export const DailyTrackerForm = () => {
     const selectedDateKey = selectedDateUTC.format('YYYY-MM-DD');
     const minSelectableDate = dateUTC.clone().subtract(6, "days").toDate();
     const maxSelectableDate = dateUTC.clone().toDate();
-    const { data: activeAction, isLoading: isLoadingActiveAction } = useGetActionsQuery({ active: true });
+    const { data: activeAction, isLoading: isLoadingActiveAction } = useGetActionsQuery({
+        active: true,
+        asOfDate: selectedDateKey,
+    });
     const { data: events, isLoading: isLoadingTodayEvents } = useGetEventsQuery({
         startDate: selectedDateUTC.clone().startOf('day').toISOString(),
         endDate: selectedDateUTC.clone().endOf('day').toISOString()
@@ -45,6 +49,9 @@ export const DailyTrackerForm = () => {
         let currentEvents = events ? events[selectedDateKey] || [] : [];
         const eventActions: EventActionDTO[] = [];
         activeAction?.forEach((action) => {
+            if (!isActionVisibleOnDate(action, selectedDateKey)) {
+                return;
+            }
             const matchedEvent = currentEvents.find((event) => event.actionId === action.id);
             eventActions.push({
                 actionId: action.id,

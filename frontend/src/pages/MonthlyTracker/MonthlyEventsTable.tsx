@@ -17,6 +17,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import moment from 'moment';
 import { EventStatusCell } from '../../components/EventStatusCell';
 import { priorityActionStyles } from '../../constants/constants';
+import { ACTION_NOT_APPLICABLE_STATUS } from '../../utils/actionDate';
 import type { MonthlyRow } from '../../hooks/useMonthlyEventGrid';
 import type { DialogActionType } from '../../types/types';
 
@@ -164,6 +165,7 @@ export const MonthlyEventsTable = ({
                   ...(row.priority && {
                     boxShadow: `inset 0 0 0 ${priorityActionStyles.borderWidth}px ${priorityActionStyles.edgeColor}`,
                   }),
+                  ...(!row.active && { opacity: 0.85 }),
                   '&:hover': { bgcolor: rowHoverBg },
                   '&:last-child td': { borderBottom: 0 },
                 }}
@@ -225,9 +227,13 @@ export const MonthlyEventsTable = ({
                       dateKey={key}
                       prompt={row.prompt}
                       isMobile={isMobile}
-                      readOnly={key !== todayKey}
+                      readOnly={
+                        key !== todayKey
+                        || !row.active
+                        || row.cells[key] === ACTION_NOT_APPLICABLE_STATUS
+                      }
                       onAction={
-                        onCellAction && key === todayKey
+                        onCellAction && key === todayKey && row.active
                           ? (type) => onCellAction(row.actionId, row.prompt, key, type)
                           : undefined
                       }

@@ -5,6 +5,7 @@ import { useState } from 'react';
 import moment from 'moment';
 import { DialogAction } from '../constants/constants';
 import type { DialogActionType } from '../types/types';
+import { ACTION_NOT_APPLICABLE_STATUS } from '../utils/actionDate';
 
 const STATUS_LABELS: Record<number, string> = {
   10: 'Cancelled',
@@ -32,6 +33,7 @@ export const EventStatusCell = ({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const isPending = status === 20;
+  const isNotApplicable = status === ACTION_NOT_APPLICABLE_STATUS;
   const cellDate = moment.utc(dateKey, 'YYYY-MM-DD');
   const isPastPending = isPending && cellDate.isBefore(moment.utc(), 'day');
 
@@ -39,8 +41,7 @@ export const EventStatusCell = ({
   const iconSize = isMobile ? 18 : 16;
   const dashSize = isMobile ? 18 : 16;
 
-  const indicator =
-    status === 30 ? (
+  const indicator = isNotApplicable ? null : status === 30 ? (
       <Box
         sx={{
           width: badgeSize,
@@ -103,10 +104,14 @@ export const EventStatusCell = ({
     );
 
   const formattedDate = cellDate.format('MMM D');
-  const statusLabel = isPastPending ? 'Missed' : (STATUS_LABELS[status] ?? 'Unknown');
-  const tooltipTitle = `${statusLabel} — ${formattedDate}`;
+  const statusLabel = isNotApplicable
+    ? 'Not applicable'
+    : isPastPending
+      ? 'Missed'
+      : (STATUS_LABELS[status] ?? 'Unknown');
+  const tooltipTitle = isNotApplicable ? '' : `${statusLabel} — ${formattedDate}`;
 
-  const isInteractive = !readOnly && Boolean(onAction);
+  const isInteractive = !readOnly && !isNotApplicable && Boolean(onAction);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     if (!isInteractive || !onAction) return;
@@ -154,9 +159,13 @@ export const EventStatusCell = ({
 
   return (
     <>
-      <Tooltip title={tooltipTitle} arrow>
-        {cellContent}
-      </Tooltip>
+      {isNotApplicable ? (
+        cellContent
+      ) : (
+        <Tooltip title={tooltipTitle} arrow>
+          {cellContent}
+        </Tooltip>
+      )}
       {isInteractive && (
         <Menu
           anchorEl={anchorEl}

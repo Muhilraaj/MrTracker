@@ -9,6 +9,8 @@ interface Action {
     active: boolean;
     sequence: number;
     priority: boolean;
+    createdDate: string | null;
+    activeFromDate: string | null;
 }
 
 interface Event {
@@ -21,6 +23,17 @@ interface Event {
 
 interface ActionParameters {
     active?: boolean;
+    asOfDate?: string;
+}
+
+interface ActionRequest {
+    name: string;
+    goal?: string;
+    prompt: string;
+    priority?: boolean;
+    sequence?: number;
+    active?: boolean;
+    activeFromDate?: string;
 }
 
 interface EventParameters {
@@ -64,4 +77,4 @@ export type AuthResponse = {
 };
 
 type DialogActionType = 'complete' | 'cancel' | 'revert';
-export type { Action, Event, ActionParameters, EventParameters, ToDoProps, DialogActionType, TaskStyle, DialogWrapperProps };
+export type { Action, Event, ActionParameters, ActionRequest, EventParameters, ToDoProps, DialogActionType, TaskStyle, DialogWrapperProps };

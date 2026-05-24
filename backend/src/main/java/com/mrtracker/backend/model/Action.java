@@ -5,6 +5,8 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.Instant;
+
 
 @Data
 @Document(collection = "actions")
@@ -25,4 +27,8 @@ public class Action {
     private int sequence;
     @JsonProperty
     private Boolean priority = false;
+    @JsonProperty
+    private Instant createdDate;
+    @JsonProperty
+    private Instant activeFromDate;
 }

@@ -15,6 +15,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 const NAV_ITEMS = [
   { label: 'Daily Tracker', path: '/page/tracker/daily/form' },
   { label: 'Monthly View', path: '/page/tracker/monthly/view' },
+  { label: 'Manage Actions', path: '/page/actions/manage' },
 ];
 
 interface TrackerAppBarProps {

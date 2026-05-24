@@ -2,12 +2,18 @@ import { useMemo, useState } from 'react';
 import moment from 'moment';
 import { useGetActionsQuery } from '../stores/api/action';
 import { useGetEventsQuery } from '../stores/api/event';
+import {
+  ACTION_NOT_APPLICABLE_STATUS,
+  getActionActiveFromDateKey,
+  isActionVisibleOnDate,
+} from '../utils/actionDate';
 
 export interface MonthlyRow {
   actionId: string;
   prompt: string;
   sequence: number;
   priority: boolean;
+  active: boolean;
   cells: Record<string, number>;
 }
 
@@ -27,18 +33,45 @@ export const useMonthlyEventGrid = () => {
     );
   }, [monthKey]);
 
-  const { data: actions, isLoading: isLoadingActions } = useGetActionsQuery({ active: true });
+  const { data: actions, isLoading: isLoadingActions } = useGetActionsQuery();
   const { data: events, isLoading: isLoadingEvents } = useGetEventsQuery({
     startDate: monthStart.toISOString(),
     endDate: monthEnd.toISOString(),
   });
 
   const rows = useMemo<MonthlyRow[]>(() => {
-    if (!actions) return [];
+    if (!actions || dateKeys.length === 0) return [];
 
-    return actions.map((action) => {
+    const monthEndKey = dateKeys[dateKeys.length - 1];
+
+    const actionHasEventInMonth = (actionId: string) =>
+      dateKeys.some((dateKey) =>
+        (events?.[dateKey] ?? []).some((event) => event.actionId === actionId)
+      );
+
+    const visibleActions = actions.filter((action) => {
+      if (getActionActiveFromDateKey(action) > monthEndKey) {
+        return false;
+      }
+      if (action.active) {
+        return true;
+      }
+      return actionHasEventInMonth(action.id);
+    });
+
+    return visibleActions
+      .sort((a, b) => {
+        const priorityDiff = Number(b.priority ?? false) - Number(a.priority ?? false);
+        if (priorityDiff !== 0) return priorityDiff;
+        return a.sequence - b.sequence;
+      })
+      .map((action) => {
       const cells: Record<string, number> = {};
       for (const dateKey of dateKeys) {
+        if (!isActionVisibleOnDate(action, dateKey)) {
+          cells[dateKey] = ACTION_NOT_APPLICABLE_STATUS;
+          continue;
+        }
         const dayEvents = events?.[dateKey] ?? [];
         const match = dayEvents.find((event) => event.actionId === action.id);
         cells[dateKey] = match?.status ?? 20;
@@ -48,6 +81,7 @@ export const useMonthlyEventGrid = () => {
         prompt: action.prompt,
         sequence: action.sequence,
         priority: action.priority ?? false,
+        active: action.active ?? true,
         cells,
       };
     });
