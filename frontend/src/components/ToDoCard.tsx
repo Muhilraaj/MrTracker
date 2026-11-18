@@ -1,14 +1,14 @@
 import {
-  Typography, IconButton, Card, CardHeader, Menu,
+  Typography, IconButton, Card, CardActionArea, Menu,
   MenuItem
 } from "@mui/material";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useState } from "react";
 import type { DialogActionType, ToDoProps } from "../types/types";
-import { actionStatusColorMap, DialogAction, priorityActionStyles } from "../constants/constants";
+import { actionStatusColorMap, DialogAction, isSelectableEventStatus, priorityActionStyles } from "../constants/constants";
 
 export const ToDoCard = (props: ToDoProps) => {
-  const { eventActionDTO } = props;
+  const { eventActionDTO, selected, onToggleSelection, disabled } = props;
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const isPriority = eventActionDTO.priority;
@@ -26,26 +26,48 @@ export const ToDoCard = (props: ToDoProps) => {
     handleMenuClose();
   }
   const isPending: boolean = eventActionDTO.status === 20;
+  const header = (
+    <Typography
+      component="span"
+      variant="h6"
+      fontWeight={isPriority ? priorityActionStyles.fontWeight : 200}
+      sx={{
+        display: 'block',
+        pl: 4,
+        pr: 2,
+        py: 2,
+        textDecoration: isPending ? 'none' : 'line-through',
+        color: statusColor,
+      }}
+    >
+      {eventActionDTO.prompt}
+    </Typography>
+  );
+
   return (
     <Card sx={{
+      display: 'flex',
       borderRadius: 2,
       border: isPriority
         ? `${priorityActionStyles.borderWidth}px solid ${priorityActionStyles.edgeColor}`
         : 1,
-      borderColor: isPriority ? priorityActionStyles.edgeColor : statusColor,
-      bgcolor: isPriority ? priorityActionStyles.bgcolor : undefined,
+      borderColor: selected ? 'primary.main' : isPriority ? priorityActionStyles.edgeColor : statusColor,
+      bgcolor: selected ? 'action.selected' : isPriority ? priorityActionStyles.bgcolor : undefined,
+      boxShadow: selected ? (theme) => `0 0 0 1px ${theme.palette.primary.main}` : undefined,
     }}>
-      <CardHeader sx={{ pl: 4 }} title={<Typography
-        variant="h6"
-        fontWeight={isPriority ? priorityActionStyles.fontWeight : 200}
-        sx={{
-          textDecoration: isPending ? 'none' : 'line-through',
-          color: statusColor,
-        }}
+      {isSelectableEventStatus(eventActionDTO.status) ? (
+        <CardActionArea aria-pressed={selected} onClick={onToggleSelection} disabled={disabled}>
+          {header}
+        </CardActionArea>
+      ) : header}
+      <IconButton
+        aria-label={`Actions for ${eventActionDTO.prompt}`}
+        sx={{ alignSelf: 'center', mr: 1, color: statusColor }}
+        onClick={handleMenuOpen}
+        disabled={disabled}
       >
-        {eventActionDTO.prompt}
-      </Typography>}
-        action={<IconButton aria-label="settings" sx={{ pl: 4, color: statusColor }} onClick={handleMenuOpen}><MoreVertIcon /></IconButton>} />
+        <MoreVertIcon />
+      </IconButton>
       <Menu
         anchorEl={anchorEl}
         open={open}
