@@ -44,6 +44,9 @@ interface EventParameters {
 interface ToDoProps {
     eventActionDTO: EventActionDTO;
     onAction: (type: DialogActionType, eventActionDTO: EventActionDTO) => void;
+    selected: boolean;
+    onToggleSelection: () => void;
+    disabled: boolean;
 }
 
 interface TaskStyle {

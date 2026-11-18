@@ -3,12 +3,14 @@ import { useGetActionsQuery } from "../../stores/api/action";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import theme from '../../assets/theme';
 import Box from "@mui/material/Box";
+import { EventSelectionActions } from "../../components/EventSelectionActions";
 import { TrackerAppBar } from "../../components/TrackerAppBar";
 import { ToDoCard } from "../../components/ToDoCard";
 import DialogWrapper from "../../components/DialogWrapper";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { DialogActionType } from "../../types/types";
 import { DialogAction } from "../../constants/constants";
+import { useEventSelection } from "../../hooks/useEventSelection";
 import { useGetEventsQuery, usePostEventMutation } from "../../stores/api/event";
 import moment from "moment";
 import type { EventActionDTO } from "../../types/types";
@@ -28,40 +30,38 @@ export const DailyTrackerForm = () => {
     const selectedDateKey = selectedDateUTC.format('YYYY-MM-DD');
     const minSelectableDate = dateUTC.clone().subtract(6, "days").toDate();
     const maxSelectableDate = dateUTC.clone().toDate();
-    const { data: activeAction, isLoading: isLoadingActiveAction } = useGetActionsQuery({
+    const { currentData: activeActions, isFetching: isFetchingActions } = useGetActionsQuery({
         active: true,
         asOfDate: selectedDateKey,
     });
-    const { data: events, isLoading: isLoadingTodayEvents } = useGetEventsQuery({
+    const { currentData: events, isFetching: isFetchingEvents } = useGetEventsQuery({
         startDate: selectedDateUTC.clone().startOf('day').toISOString(),
         endDate: selectedDateUTC.clone().endOf('day').toISOString()
     });
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogType, setDialogType] = useState<DialogActionType>(DialogAction.COMPLETE);
-    const [currentEventActions, setCurrentEventActions] = useState<EventActionDTO[]>([]);
     const [selectedEventAction, setSelectedEventAction] = useState<EventActionDTO | null>(null);
     const [postEvent,{ isLoading: isLoadingPostEvent }] = usePostEventMutation();
     const dispatch = useDispatch();
 
-    const isLoading = isLoadingActiveAction || isLoadingTodayEvents || isLoadingPostEvent;
-
-    useEffect(() => {
-        let currentEvents = events ? events[selectedDateKey] || [] : [];
-        const eventActions: EventActionDTO[] = [];
-        activeAction?.forEach((action) => {
-            if (!isActionVisibleOnDate(action, selectedDateKey)) {
-                return;
-            }
-            const matchedEvent = currentEvents.find((event) => event.actionId === action.id);
-            eventActions.push({
-                actionId: action.id,
-                status: matchedEvent?.status || 20,
-                prompt: action.prompt,
-                priority: action.priority ?? false,
-            });
-        });
-        setCurrentEventActions(eventActions);
-    }, [events, activeAction, selectedDateKey]);
+    const isLoading = (isFetchingActions && !activeActions) || (isFetchingEvents && !events) || isLoadingPostEvent;
+    const currentEvents = events?.[selectedDateKey] ?? [];
+    const currentEventActions: EventActionDTO[] = (activeActions ?? [])
+        .filter((action) => isActionVisibleOnDate(action, selectedDateKey))
+        .map((action) => ({
+            actionId: action.id,
+            status: currentEvents.find((event) => event.actionId === action.id)?.status || 20,
+            prompt: action.prompt,
+            priority: action.priority ?? false,
+        }));
+    const {
+        selectedIds, isSaving, isSelectionDisabled, canCompleteOrCancel, canRevert, hasMixedSelection,
+        toggleSelection, submitSelection,
+    } = useEventSelection(
+        selectedDateKey,
+        currentEventActions,
+        !activeActions || !events || isFetchingActions || isFetchingEvents || isLoadingPostEvent,
+    );
 
     const handleOpenDialog = (type: DialogActionType, eventActionDTO: EventActionDTO) => {
         setDialogType(type);
@@ -74,17 +74,18 @@ export const DailyTrackerForm = () => {
         });
     }
 
-    const onSubmitDialog = () => {
-        // Handle dialog submission logic here
+    const onSubmitDialog = async () => {
+        if (!selectedEventAction || isLoadingPostEvent) return;
+
         try {
-            postEvent({
-                actionId: selectedEventAction?.actionId || '',
-                status: selectedEventAction?.status || 10,
+            await postEvent({
+                actionId: selectedEventAction.actionId,
+                status: selectedEventAction.status,
                 eventDate: selectedDateUTC.toDate(),
             }).unwrap();
             setOpenDialog(false);
             dispatch(showSnackbar({ message: 'Event updated successfully', type: 'success' }));
-        } catch (error) {
+        } catch {
             dispatch(showSnackbar({ message: 'Failed to update event', type: 'error' }));
         }
     }
@@ -97,11 +98,12 @@ export const DailyTrackerForm = () => {
                     display="flex"
                     flexDirection={'column'}
                 >
-                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                         <DatePicker
                             label="Select Date"
                             value={selectedDate}
                             onChange={(newValue) => setSelectedDate(newValue)}
+                            disabled={isSaving}
                             minDate={minSelectableDate}
                             maxDate={maxSelectableDate}
                             format="MMMM dd, yyyy"
@@ -111,13 +113,25 @@ export const DailyTrackerForm = () => {
                                 }
                             }}
                         />
+                        <EventSelectionActions
+                            selectedIds={selectedIds}
+                            disabled={isSelectionDisabled}
+                            isSaving={isSaving}
+                            canCompleteOrCancel={canCompleteOrCancel}
+                            canRevert={canRevert}
+                            hasMixedSelection={hasMixedSelection}
+                            onSubmit={submitSelection}
+                        />
                     </Box>
                     {!isLoading && <Grid container spacing={2} >
                         {currentEventActions.map((eventAction) => (
-                            <Grid >
+                            <Grid key={eventAction.actionId}>
                                 <ToDoCard
                                     eventActionDTO={eventAction}
                                     onAction={handleOpenDialog}
+                                    selected={selectedIds.has(eventAction.actionId)}
+                                    onToggleSelection={() => toggleSelection(eventAction.actionId)}
+                                    disabled={isSelectionDisabled}
                                 />
                             </Grid>
                         ))}

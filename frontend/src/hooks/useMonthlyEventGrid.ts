@@ -34,7 +34,7 @@ export const useMonthlyEventGrid = () => {
   }, [monthKey]);
 
   const { data: actions, isLoading: isLoadingActions } = useGetActionsQuery();
-  const { data: events, isLoading: isLoadingEvents } = useGetEventsQuery({
+  const { currentData: events, isFetching: isFetchingEvents } = useGetEventsQuery({
     startDate: monthStart.toISOString(),
     endDate: monthEnd.toISOString(),
   });
@@ -102,7 +102,8 @@ export const useMonthlyEventGrid = () => {
     monthEnd,
     dateKeys,
     rows,
-    isLoading: isLoadingActions || isLoadingEvents,
+    isLoading: isLoadingActions || (isFetchingEvents && !events),
+    canUpdateEvents: Boolean(actions && events) && !isFetchingEvents,
     goToPreviousMonth,
     goToNextMonth,
   };

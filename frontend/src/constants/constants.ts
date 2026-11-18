@@ -4,6 +4,8 @@ export const actionStatusColorMap: { [key: number]: string } = {
     30: 'success.main'  // Completed
 };
 
+export const isSelectableEventStatus = (status: number) => status === 10 || status === 20 || status === 30;
+
 export const priorityActionStyles = {
     borderWidth: 2,
     edgeColor: '#D4AF37',

@@ -3,6 +3,10 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { Event, EventParameters } from '../../types/types';
 import moment from 'moment';
 
+type EventUpdate = Pick<Event, 'actionId' | 'status' | 'eventDate'>;
+
+const eventUpdateRequest = (body: Partial<Event>) => ({ url: '', method: 'POST', body });
+
 export const eventApi = createApi({
   reducerPath: 'eventApi',
   baseQuery: fetchBaseQuery({ baseUrl: `/api/events`, credentials: 'include' }),
@@ -20,15 +24,21 @@ export const eventApi = createApi({
         return response[today] || [];
       }
     }),
-    postEvent: builder.mutation<Event, Partial<Event>>({
-      query: (newEvent: Partial<Event>) => ({
-        url: '',
-        method: 'POST',
-        body: newEvent,
-      }),
+    postEvent: builder.mutation<void, Partial<Event>>({
+      query: eventUpdateRequest,
       invalidatesTags: ['Events'],
-    })
+    }),
+    postEvents: builder.mutation<string[], EventUpdate[]>({
+      async queryFn(updates, _api, _options, baseQuery) {
+        const results = await Promise.all(updates.map(async (update) => {
+          const result = await baseQuery(eventUpdateRequest(update));
+          return result.error ? update.actionId : undefined;
+        }));
+        return { data: results.filter((actionId) => actionId !== undefined) };
+      },
+      invalidatesTags: ['Events'],
+    }),
   }),
 });
 
-export const { useGetEventsQuery, useGetTodayEventsQuery, usePostEventMutation } = eventApi;
+export const { useGetEventsQuery, useGetTodayEventsQuery, usePostEventMutation, usePostEventsMutation } = eventApi;
