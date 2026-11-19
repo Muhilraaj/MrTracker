@@ -21,3 +21,9 @@ export const DialogAction = {
     CANCEL: 'cancel',
     REVERT: 'revert'
 } as const;
+
+export const eventActionAppearance = {
+    [DialogAction.COMPLETE]: { label: 'Complete', color: 'success' },
+    [DialogAction.CANCEL]: { label: 'Cancel', color: 'error' },
+    [DialogAction.REVERT]: { label: 'Revert', color: 'warning' },
+} as const;

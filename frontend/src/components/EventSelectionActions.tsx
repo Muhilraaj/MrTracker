@@ -1,7 +1,8 @@
-import { useId, useState } from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
-import { DialogAction } from '../constants/constants';
+import { useState } from 'react';
+import { Button, Stack, Typography } from '@mui/material';
+import { DialogAction, eventActionAppearance } from '../constants/constants';
 import type { DialogActionType } from '../types/types';
+import DialogWrapper from './DialogWrapper';
 
 interface EventSelectionActionsProps {
   selectedIds: ReadonlySet<string>;
@@ -13,16 +14,9 @@ interface EventSelectionActionsProps {
   onSubmit: (action: DialogActionType) => void;
 }
 
-const actionButtons = {
-  [DialogAction.COMPLETE]: { label: 'Complete', color: 'success' },
-  [DialogAction.CANCEL]: { label: 'Cancel', color: 'error' },
-  [DialogAction.REVERT]: { label: 'Revert', color: 'warning' },
-} as const;
-
 export const EventSelectionActions = ({
   selectedIds, disabled, isSaving, canCompleteOrCancel, canRevert, hasMixedSelection, onSubmit,
 }: EventSelectionActionsProps) => {
-  const titleId = useId();
   const [confirmation, setConfirmation] = useState<{
     action: DialogActionType;
     eventIds: ReadonlySet<string>;
@@ -55,11 +49,11 @@ export const EventSelectionActions = ({
             <Button
               key={action}
               variant="contained"
-              color={actionButtons[action].color}
+              color={eventActionAppearance[action].color}
               disabled={disabled}
               onClick={() => setConfirmation({ action, eventIds: selectedIds })}
             >
-              {actionButtons[action].label}
+              {eventActionAppearance[action].label}
             </Button>
           ))}
         </Stack>
@@ -71,25 +65,18 @@ export const EventSelectionActions = ({
         </Typography>
       )}
       {confirmation && (
-        <Dialog open onClose={closeConfirmation} aria-labelledby={titleId} fullWidth maxWidth="xs">
-          <DialogTitle id={titleId}>{actionButtons[confirmation.action].label} the selected events?</DialogTitle>
+        <DialogWrapper
+          action={confirmation.action}
+          open
+          subject="the selected events"
+          confirmDisabled={disabled || !canConfirm}
+          onClose={closeConfirmation}
+          onSubmit={submitConfirmedAction}
+        >
           {!canConfirm && (
-            <DialogContent>
-              <Typography role="status">The selection changed. Go back to review the events.</Typography>
-            </DialogContent>
+            <Typography role="status">The selection changed. Go back to review the events.</Typography>
           )}
-          <DialogActions>
-            <Button autoFocus onClick={closeConfirmation}>Go back</Button>
-            <Button
-              variant="contained"
-              color={actionButtons[confirmation.action].color}
-              disabled={disabled || !canConfirm}
-              onClick={submitConfirmedAction}
-            >
-              Confirm
-            </Button>
-          </DialogActions>
-        </Dialog>
+        </DialogWrapper>
       )}
     </Stack>
   );
