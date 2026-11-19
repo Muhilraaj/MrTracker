@@ -19,13 +19,14 @@ import { EventStatusCell } from '../../components/EventStatusCell';
 import { priorityActionStyles } from '../../constants/constants';
 import { ACTION_NOT_APPLICABLE_STATUS } from '../../utils/actionDate';
 import type { MonthlyRow } from '../../hooks/useMonthlyEventGrid';
-import type { DialogActionType } from '../../types/types';
 
 interface MonthlyEventsTableProps {
   rows: MonthlyRow[];
   dateKeys: string[];
   todayKey: string;
-  onCellAction?: (actionId: string, prompt: string, dateKey: string, type: DialogActionType) => void;
+  selectedIds: ReadonlySet<string>;
+  disabled: boolean;
+  onToggleSelection: (actionId: string) => void;
 }
 
 const headerCellSx = {
@@ -43,7 +44,9 @@ export const MonthlyEventsTable = ({
   rows,
   dateKeys,
   todayKey,
-  onCellAction,
+  selectedIds,
+  disabled,
+  onToggleSelection,
 }: MonthlyEventsTableProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -232,11 +235,9 @@ export const MonthlyEventsTable = ({
                         || !row.active
                         || row.cells[key] === ACTION_NOT_APPLICABLE_STATUS
                       }
-                      onAction={
-                        onCellAction && key === todayKey && row.active
-                          ? (type) => onCellAction(row.actionId, row.prompt, key, type)
-                          : undefined
-                      }
+                      disabled={disabled}
+                      selected={key === todayKey && selectedIds.has(row.actionId)}
+                      onToggleSelection={() => onToggleSelection(row.actionId)}
                     />
                   </TableCell>
                 ))}

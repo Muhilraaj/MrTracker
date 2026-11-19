@@ -1,10 +1,8 @@
-import { Box, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
+import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
-import { useState } from 'react';
 import moment from 'moment';
-import { DialogAction } from '../constants/constants';
-import type { DialogActionType } from '../types/types';
+import { isSelectableEventStatus } from '../constants/constants';
 import { ACTION_NOT_APPLICABLE_STATUS } from '../utils/actionDate';
 
 const STATUS_LABELS: Record<number, string> = {
@@ -19,7 +17,9 @@ interface EventStatusCellProps {
   prompt: string;
   isMobile?: boolean;
   readOnly?: boolean;
-  onAction?: (type: DialogActionType) => void;
+  disabled?: boolean;
+  selected?: boolean;
+  onToggleSelection: () => void;
 }
 
 export const EventStatusCell = ({
@@ -28,10 +28,10 @@ export const EventStatusCell = ({
   prompt,
   isMobile = false,
   readOnly = false,
-  onAction,
+  disabled = false,
+  selected = false,
+  onToggleSelection,
 }: EventStatusCellProps) => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
   const isPending = status === 20;
   const isNotApplicable = status === ACTION_NOT_APPLICABLE_STATUS;
   const cellDate = moment.utc(dateKey, 'YYYY-MM-DD');
@@ -96,11 +96,17 @@ export const EventStatusCell = ({
           width: badgeSize,
           height: badgeSize,
           borderRadius: '50%',
-          border: '1px dashed',
-          borderColor: 'divider',
-          bgcolor: 'background.paper',
+          border: selected ? '1px solid' : '1px dashed',
+          borderColor: selected ? 'primary.main' : 'divider',
+          bgcolor: selected ? 'primary.main' : 'background.paper',
+          color: 'primary.contrastText',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
-      />
+      >
+        {selected && <CheckIcon sx={{ fontSize: iconSize }} />}
+      </Box>
     );
 
   const formattedDate = cellDate.format('MMM D');
@@ -109,19 +115,9 @@ export const EventStatusCell = ({
     : isPastPending
       ? 'Missed'
       : (STATUS_LABELS[status] ?? 'Unknown');
-  const tooltipTitle = isNotApplicable ? '' : `${statusLabel} — ${formattedDate}`;
+  const tooltipTitle = `${statusLabel}${selected ? ' (selected)' : ''} — ${formattedDate}`;
 
-  const isInteractive = !readOnly && !isNotApplicable && Boolean(onAction);
-
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    if (!isInteractive || !onAction) return;
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuAction = (type: DialogActionType) => {
-    onAction?.(type);
-    setAnchorEl(null);
-  };
+  const isInteractive = !readOnly && isSelectableEventStatus(status);
 
   const cellContent = (
     <Box
@@ -136,12 +132,15 @@ export const EventStatusCell = ({
     >
       {isInteractive ? (
         <IconButton
-          aria-label={`${prompt} on ${formattedDate}`}
-          onClick={handleClick}
+          aria-label={`${prompt} on ${formattedDate}, ${statusLabel}`}
+          aria-pressed={selected}
+          onClick={onToggleSelection}
+          disabled={disabled}
           size="small"
           sx={{
             p: 0.25,
             borderRadius: '50%',
+            ...(selected && { outline: '2px solid', outlineColor: 'primary.main' }),
             transition: 'transform 0.15s ease, background-color 0.15s ease',
             '&:hover': {
               transform: 'scale(1.08)',
@@ -157,39 +156,5 @@ export const EventStatusCell = ({
     </Box>
   );
 
-  return (
-    <>
-      {isNotApplicable ? (
-        cellContent
-      ) : (
-        <Tooltip title={tooltipTitle} arrow>
-          {cellContent}
-        </Tooltip>
-      )}
-      {isInteractive && (
-        <Menu
-          anchorEl={anchorEl}
-          open={open}
-          onClose={() => setAnchorEl(null)}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-          transformOrigin={{ vertical: 'top', horizontal: 'center' }}
-          slotProps={{
-            paper: {
-              sx: { borderRadius: 2, minWidth: 140, boxShadow: 3 },
-            },
-          }}
-        >
-          {isPending && (
-            <MenuItem onClick={() => handleMenuAction(DialogAction.COMPLETE)}>Complete</MenuItem>
-          )}
-          {isPending && (
-            <MenuItem onClick={() => handleMenuAction(DialogAction.CANCEL)}>Cancel</MenuItem>
-          )}
-          {!isPending && (
-            <MenuItem onClick={() => handleMenuAction(DialogAction.REVERT)}>Revert</MenuItem>
-          )}
-        </Menu>
-      )}
-    </>
-  );
+  return isNotApplicable ? cellContent : <Tooltip title={tooltipTitle} arrow>{cellContent}</Tooltip>;
 };

@@ -1,39 +1,38 @@
-import { Dialog, DialogContent,DialogActions,Button, IconButton, Typography } from "@mui/material";
-import type { DialogWrapperProps } from "../types/types";
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
-import UndoIcon from '@mui/icons-material/Undo';
-import type { DialogActionType, TaskStyle } from "../types/types";
+import { useId, type ReactNode } from 'react';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { eventActionAppearance } from '../constants/constants';
+import type { DialogActionType } from '../types/types';
 
 
-export const dialogWrapperMapper: Record<DialogActionType, TaskStyle> = {
-    'complete': { icon: <CheckCircleIcon color='success' sx={{ fontSize: 60 }}/>, color: 'success' },
-    'cancel': { icon: <CancelIcon color='error' sx={{ fontSize: 60 }}/>, color: 'error' },
-    'revert': { icon: <UndoIcon color='warning' sx={{ fontSize: 60 }}/>, color: 'warning' },
-};
+interface DialogWrapperProps {
+  action: DialogActionType;
+  open: boolean;
+  subject: string;
+  children?: ReactNode;
+  confirmDisabled?: boolean;
+  onSubmit: () => void;
+  onClose: () => void;
+}
 
 
-const DialogWrapper = ({type,isopen, task, onSubmit, onClose }: DialogWrapperProps) => {
-  const capitalizeFirst = (str: string) =>
-  str.charAt(0).toUpperCase() + str.slice(1);
+const DialogWrapper = ({
+  action, open, subject, children, confirmDisabled = false, onSubmit, onClose,
+}: DialogWrapperProps) => {
+  const titleId = useId();
+  const { label, color } = eventActionAppearance[action];
+
   return (
-    <Dialog open={isopen} onClose={onClose}>
-      <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'center', padding:4 }}>
-        <IconButton sx={{ fontSize: 60 }}>
-          {dialogWrapperMapper[type].icon}
-        </IconButton>
-        <Typography variant="h6" component="div">
-          {capitalizeFirst(type)} this task?
-        </Typography>
-        <Typography variant="h6" component="div">
-            {task}
-        </Typography>
-      </DialogContent>
-      <DialogActions sx={{display:'flex', flexDirection:'row', justifyContent:'space-evenly', padding:2}}>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={onSubmit} color={dialogWrapperMapper[type].color}>{type}</Button>
+    <Dialog open={open} onClose={onClose} aria-labelledby={titleId} fullWidth maxWidth="xs">
+      <DialogTitle id={titleId}>{label} {subject}?</DialogTitle>
+      {children && <DialogContent>{children}</DialogContent>}
+      <DialogActions>
+        <Button autoFocus onClick={onClose}>Go back</Button>
+        <Button variant="contained" color={color} disabled={confirmDisabled} onClick={onSubmit}>
+          Confirm
+        </Button>
       </DialogActions>
     </Dialog>
   );
 };
+
 export default DialogWrapper;
