@@ -1,5 +1,3 @@
-import type { JSX } from "react";
-
 interface Action {
     id: string;
     name: string;
@@ -49,19 +47,6 @@ interface ToDoProps {
     disabled: boolean;
 }
 
-interface TaskStyle {
-  color: 'success' | 'error' | 'warning';
-  icon: JSX.Element;
-}
-
-interface DialogWrapperProps {
-    type: DialogActionType;
-    isopen: boolean;
-    task: string;
-    onSubmit: () => void;
-    onClose: () => void;
-}
-
 export interface EventActionDTO{
     actionId: string;
     status: number;
@@ -80,4 +65,4 @@ export type AuthResponse = {
 };
 
 type DialogActionType = 'complete' | 'cancel' | 'revert';
-export type { Action, Event, ActionParameters, ActionRequest, EventParameters, ToDoProps, DialogActionType, TaskStyle, DialogWrapperProps };
+export type { Action, Event, ActionParameters, ActionRequest, EventParameters, ToDoProps, DialogActionType };

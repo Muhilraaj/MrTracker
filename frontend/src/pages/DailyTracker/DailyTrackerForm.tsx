@@ -15,7 +15,7 @@ import { useGetEventsQuery, usePostEventMutation } from "../../stores/api/event"
 import moment from "moment";
 import type { EventActionDTO } from "../../types/types";
 import { isActionVisibleOnDate } from "../../utils/actionDate";
-import { Grid } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import { showSnackbar } from "../../stores/slices/snackbarSlice";
 import { useDispatch } from "react-redux";
 import CircularProgress from '@mui/material/CircularProgress';
@@ -141,12 +141,15 @@ export const DailyTrackerForm = () => {
                     </Box>}
                 </Box>
                 <DialogWrapper
-                    type={dialogType}
-                    isopen={openDialog}
-                    onSubmit={() => onSubmitDialog()}
-                    task={selectedEventAction?.prompt || ''}
+                    action={dialogType}
+                    open={openDialog}
+                    subject="this task"
+                    confirmDisabled={isLoadingPostEvent}
+                    onSubmit={onSubmitDialog}
                     onClose={() => setOpenDialog(false)}
-                />
+                >
+                    <Typography>{selectedEventAction?.prompt}</Typography>
+                </DialogWrapper>
             </Box>
         </ThemeProvider>
     );
